@@ -26,15 +26,18 @@ after() {
 	:
 }
 
-number_of_specs
+specs() {
+	local number_of_specs=0
 
-if (($# > 0)); then
-	specs=$@
-else
-	specs=*.spec
-fi
+	if (($# > 0)); then
+		specs=$@
+	else
+		specs=*.spec
+	fi
 
-for spec in "$specs"; do
-  echo "spexx $spec"
-	. $spec
-done
+	for spec in "$specs"; do
+		. $spec
+	done
+}
+
+specs "$@"
