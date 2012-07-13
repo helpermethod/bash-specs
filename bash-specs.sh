@@ -9,11 +9,11 @@ it() {
 
 	local result=$(eval "$2")
 
-  if [[ $result ]]; then
+	if [[ $result ]]; then
 		echo "was successful."
-  else
+	else
 		echo "wasn't successful."
-  fi
+	fi
 
 	after_each
 }
