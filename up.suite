@@ -1,0 +1,18 @@
+describe "up"
+
+before_each() {
+  dir=$PWD
+  mkdir -p .sandbox/foo/bar
+  cd .sandbox
+}
+
+it "should execute up" '{
+	cd foo/bar
+  up
+  [[ $PWD = "$dir/.sandbox/foo" ]]
+}'
+
+after_each() {
+  PWD=$dir
+  rm -r .sandbox
+}

@@ -1,22 +1,40 @@
 #/usr/bin/env bash
 
 describe() {
-  echo $1
+	echo "$1"
 }
 
 it() {
-  before
-  eval "$2"
-  after
+	before_each
+
+	local result=$(eval "$2")
+
+  if [[ $result ]]; then
+		echo "was successful."
+  else
+		echo "wasn't successful."
+  fi
+
+	after_each
 }
 
 before() {
+	:
 }
 
 after() {
+	:
 }
 
-describe "up"
+number_of_specs
 
-it 'should do something' '{
-}'
+if (($# > 0)); then
+	specs=$@
+else
+	specs=*.spec
+fi
+
+for spec in "$specs"; do
+  echo "spexx $spec"
+	. $spec
+done
