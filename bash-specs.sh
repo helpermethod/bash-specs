@@ -1,5 +1,7 @@
 #/usr/bin/env bash
 
+number_of_specs=0
+
 describe() {
 	echo "$1"
 }
@@ -18,26 +20,20 @@ it() {
 	after_each
 }
 
-before() {
+before_each() {
 	:
 }
 
-after() {
+after_each() {
 	:
 }
 
-specs() {
-	local number_of_specs=0
+execute_suites() {
+  local suites=${}
 
-	if (($# > 0)); then
-		specs=$@
-	else
-		specs=*.spec
-	fi
-
-	for spec in "$specs"; do
-		. $spec
+	for suite in "$suites"; do
+		. "$suite"
 	done
 }
 
-specs "$@"
+execute_suites "$@"
