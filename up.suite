@@ -6,13 +6,13 @@ before_each() {
   cd .sandbox
 }
 
-it "should execute up" '{
+after_each() {
+  cd "$dir"
+  rm -r .sandbox
+}
+
+it "should move to parent directory" '{
 	cd foo/bar
   up
   [[ $PWD = "$dir/.sandbox/foo" ]]
 }'
-
-after_each() {
-  PWD=$dir
-  rm -r .sandbox
-}
