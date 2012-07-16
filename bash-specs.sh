@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
 describe() {
-	description=$1
+	description="${default_color}$1"
 }
 
 before_each() {
@@ -17,7 +17,7 @@ it() {
 
 	eval "$2"
 
-  (($? > 0)) && specs_failed
+  (($? > 0)) && ((number_of_specs_failed++))
 
   specs_results+=($1 $result)
 
@@ -28,17 +28,16 @@ print_report() {
 	local units="specs"
 	local number_of_specs=${#specs_results[@]}
 
-	((number_of_specs == 1)) && spec_or_specs="spec"
+	((number_of_specs == 1)) && units="spec"
 
 	local color=$red_color
 
 	((number_of_specs_failed == 0)) && color=$green_color
 
 	echo "${color}$number_of_specs ${units}, $number_of_specs_failed failed"
-	echo
+	echo "$description"
 
 	for spec_result in "${spec_results[@]}"; do
-		echo "$default_color  $description"
 		echo "$color    ${spec_result[1]}"
   done
 
