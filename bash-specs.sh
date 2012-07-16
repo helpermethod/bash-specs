@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
 describe() {
-	echo "$1"
+	description=$1
 }
 
 before_each() {
@@ -30,11 +30,19 @@ print_report() {
 
 	((number_of_specs == 1)) && spec_or_specs="spec"
 
-	echo "$number_of_specs ${spec_or_specs}, $number_of_specs_failed failed"
+	local color=$red_color
+
+	((number_of_specs_failed == 0)) && color=$green_color
+
+	echo "${color}$number_of_specs ${units}, $number_of_specs_failed failed"
+	echo
 
 	for spec_result in "${spec_results[@]}"; do
-		:
+		echo "$default_color  $description"
+		echo "$color    ${spec_result[1]}"
   done
+
+  echo $default_color
 }
 
 execute_suites() {
@@ -45,9 +53,9 @@ execute_suites() {
   print_report
 }
 
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-default=$(tput setaf 9)
+red_color=$(tput setaf 1)
+green_color=$(tput setaf 2)
+default_color=$(tput setaf 9)
 
 specs_results=()
 number_of_specs_failed=0
