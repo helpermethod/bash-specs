@@ -35,6 +35,7 @@ print_report() {
 	((number_of_specs_failed == 0)) && color=$green_color
 
 	echo "${color}$number_of_specs ${units}, $number_of_specs_failed failed"
+	echo
 	echo "$description"
 
 	for spec_result in "${spec_results[@]}"; do
