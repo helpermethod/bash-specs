@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
 describe() {
-	description="${default_color}$1"
+	echo "${default_color}$1"
 }
 
 before_each() {
@@ -16,33 +16,27 @@ it() {
 	before_each
 
 	eval "$2"
+	result=$?
 
-  (($? > 0)) && ((number_of_specs_failed++))
+	((number_of_specs++))
 
-  specs_results+=($1 $result)
+	if ((result > 0)); then
+		local color=$red_color
+		((number_of_specs_failed++))
+	else
+		local color=$green_color
+	fi
+
+	echo "$color  $1"
 
 	after_each
 }
 
-print_report() {
-	local units="specs"
-	local number_of_specs=${#specs_results[@]}
+print_summary() {
+	((number_of_specs == 1)) && local units='spec' || local units='specs'
+	((number_of_specs_failed == 0)) && local color=$green_color || local color=$red_color
 
-	((number_of_specs == 1)) && units="spec"
-
-	local color=$red_color
-
-	((number_of_specs_failed == 0)) && color=$green_color
-
-	echo "${color}$number_of_specs ${units}, $number_of_specs_failed failed"
-	echo
-	echo "$description"
-
-	for spec_result in "${spec_results[@]}"; do
-		echo "$color    ${spec_result[1]}"
-  done
-
-  echo $default_color
+	echo "${color}$number_of_specs ${units}, $number_of_specs_failed failed${default_color}"
 }
 
 execute_suites() {
@@ -50,14 +44,14 @@ execute_suites() {
 		. "$suite"
 	done
 
-  print_report
+  print_summary
 }
 
 red_color=$(tput setaf 1)
 green_color=$(tput setaf 2)
 default_color=$(tput setaf 9)
 
-specs_results=()
+number_of_specs=0
 number_of_specs_failed=0
 
 (($# == 0)) && set -- *.suite
