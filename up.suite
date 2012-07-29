@@ -1,4 +1,4 @@
-describe "up"
+describe 'up'
 
 before_each() {
   initial_directory=$PWD
@@ -17,13 +17,14 @@ it 'should change the current directory to the parent directory' '{
 	[[ $PWD = "$initial_directory/foo" ]]
 }'
 
-it 'should change the current directory to the grandparent directory', '{
+it 'should change the current directory to the grandparent directory' '{
 	cd foo/bar/baz
 	up -n 2
 	[[ $PWD = "$initial_directory/foo" ]]
 }'
 
-it "should fail if the current directory is the root directory", '{
+it 'should fail if the current directory is the root directory' '{
 	cd /
-	! up	
+	up
+	(($? == 3))	
 }'
