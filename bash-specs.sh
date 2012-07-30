@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
 describe() {
-	printf '%s%s\n' "$default_color" "$1"
+	printf '\n%s%s\n' "$default_color" "$1"
 }
 
 before_each() {
@@ -28,13 +28,9 @@ it() {
 		local color=$green_color
 	fi
 
-	printf '%s  %s\n' "$color" "$1"
+	echo "$color  $1"
 
 	after_each
-}
-
-print_version() {
-	printf '%s\n' "$version"
 }
 
 print_summary() {
@@ -45,7 +41,7 @@ print_summary() {
 }
 
 execute_suites() {
-	print_version
+	echo "$version"
 
 	for suite; do
 		. "$suite"
@@ -54,7 +50,11 @@ execute_suites() {
   print_summary
 }
 
-version=1.0.0
+version_number=1.0.0
+
+read -d '' version <<- EOF
+	bash-specs $version_number
+EOF
 
 red_color=$(tput setaf 1)
 green_color=$(tput setaf 2)
