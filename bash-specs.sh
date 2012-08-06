@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
 describe() {
-	printf '\n%s%s\n' "$default_color" "$1"
+	echo "${default_color}$1"
 }
 
 before_each() {
@@ -41,7 +41,7 @@ print_summary() {
 }
 
 execute_suites() {
-	echo "$version"
+	printf '%s\n\n' "$version"
 
 	for suite; do
 		. "$suite"
