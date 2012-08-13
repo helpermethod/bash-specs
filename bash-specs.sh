@@ -33,6 +33,10 @@ it() {
 	after_each
 }
 
+xit() {
+ :
+}
+
 print_summary() {
 	((number_of_specs == 1)) && local units='spec' || local units='specs'
 	((number_of_specs_failed == 0)) && local color=$green_color || local color=$red_color
