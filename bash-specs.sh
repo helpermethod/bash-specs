@@ -34,7 +34,7 @@ it() {
 }
 
 xit() {
- :
+  :
 }
 
 print_summary() {
