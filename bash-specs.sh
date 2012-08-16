@@ -34,7 +34,7 @@ it() {
 }
 
 xit() {
-  :
+	:
 }
 
 print_summary() {
@@ -51,7 +51,7 @@ execute_suites() {
 		. "$suite"
 	done
 
-  print_summary
+	print_summary
 }
 
 version_number=1.0.0
