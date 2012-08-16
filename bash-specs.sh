@@ -17,7 +17,7 @@ it() {
 
 	eval "$2"
 
-	result=$?
+	local result=$?
 
 	((number_of_specs++))
 
