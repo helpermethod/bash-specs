@@ -12,6 +12,16 @@ after_each() {
 	:
 }
 
+expect_to_be() {
+	if [[ ! $1 = $2 ]]; then
+		error_message="Expected '$1' to be '$2'."
+
+		return 1
+	fi
+
+  unset -v error_message
+}
+
 it() {
 	before_each
 
@@ -21,14 +31,15 @@ it() {
 
 	((number_of_specs++))
 
-	if ((result > 0)); then
-		local color=$red_color
-		((number_of_specs_failed++))
+	if ((result == 0)); then
+		echo "$green_color  $1"
 	else
-		local color=$green_color
-	fi
+		((number_of_specs_failed++))
 
-	echo "$color  $1"
+		echo "$red_color  $1"
+
+		[[ $error_message ]] && echo "    $error_message"
+	fi
 
 	after_each
 }
