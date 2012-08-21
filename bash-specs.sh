@@ -12,14 +12,20 @@ after_each() {
 	:
 }
 
-expect_to_be() {
+integer_equals() {
+	if ((! $1 == $2)); then
+		error_message="Expected '$1' to be '$2'."
+
+		return 1
+	fi
+}
+
+string_equals() {
 	if [[ ! $1 = $2 ]]; then
 		error_message="Expected '$1' to be '$2'."
 
 		return 1
 	fi
-
-  unset -v error_message
 }
 
 it() {
@@ -38,7 +44,10 @@ it() {
 
 		echo "$red_color  $1"
 
-		[[ $error_message ]] && echo "    $error_message"
+		if [[ $error_message ]]; then
+			echo "    $error_message"
+			unset -v error_message
+		fi
 	fi
 
 	after_each
