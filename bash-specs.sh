@@ -20,6 +20,22 @@ integer_equals() {
 	fi
 }
 
+integer_less_than() {
+  if ((! $1 < $2)); then
+		error_message="Expected '$1' to be less than '$2'."
+
+		return 1
+	fi
+}
+
+integer_greater_than() {
+	if ((! $1 > $2)); then
+		error_message="Expected '$1' to be greater than '$2'."
+
+		return 1
+	fi
+}
+
 string_equals() {
 	if [[ ! $1 = $2 ]]; then
 		error_message="Expected '$1' to be '$2'."
