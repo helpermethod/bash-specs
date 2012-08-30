@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
 describe() {
-	echo "${default_color}$1"
+	printf '%s%s\n' "$default_color" "$1"
 }
 
 before_each() {
@@ -21,7 +21,7 @@ integer_equals() {
 }
 
 integer_less_than() {
-  if ((! $1 < $2)); then
+	if ((! $1 < $2)); then
 		error_message="Expected '$1' to be less than '$2'."
 
 		return 1
@@ -54,14 +54,14 @@ it() {
 	((number_of_specs++))
 
 	if ((result == 0)); then
-		echo "$green_color  $1"
+		printf '%s  %s\n' "$green_color" "$1"
 	else
 		((number_of_specs_failed++))
 
-		echo "$red_color  $1"
+		printf '%s  %s\n' "$red_color" "$1"
 
 		if [[ $error_message ]]; then
-			echo "    $error_message"
+			printf '    %s\n' "$error_message"
 			unset -v error_message
 		fi
 	fi
