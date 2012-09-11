@@ -15,6 +15,7 @@ after_each() {
 integer_equals() {
 	if ((! $1 == $2)); then
 		error_message="Expected '$1' to be '$2'."
+    error_message_set=$true
 
 		return 1
 	fi
@@ -102,6 +103,9 @@ default_color=$(tput setaf 9)
 
 number_of_specs=0
 number_of_specs_failed=0
+
+error_message=''
+error_message_set=1
 
 (($# == 0)) && set -- *.suite
 
