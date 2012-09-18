@@ -37,7 +37,7 @@ integer_is_greater_than() {
 	fi
 }
 
-string_is_equalTo() {
+string_is_equal_to() {
 	if [[ ! $1 = $2 ]]; then
 		error_message="Expected '$1' to be '$2'."
 
