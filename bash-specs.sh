@@ -12,7 +12,7 @@ after_each() {
 	:
 }
 
-integer_equals() {
+integer_is_equal_to() {
 	if ((! $1 == $2)); then
 		error_message="Expected '$1' to be '$2'."
     error_message_set=$true
@@ -21,7 +21,7 @@ integer_equals() {
 	fi
 }
 
-integer_less_than() {
+integer_is_less_than() {
 	if ((! $1 < $2)); then
 		error_message="Expected '$1' to be less than '$2'."
 
@@ -29,7 +29,7 @@ integer_less_than() {
 	fi
 }
 
-integer_greater_than() {
+integer_is_greater_than() {
 	if ((! $1 > $2)); then
 		error_message="Expected '$1' to be greater than '$2'."
 
@@ -37,7 +37,7 @@ integer_greater_than() {
 	fi
 }
 
-string_equals() {
+string_is_equalTo() {
 	if [[ ! $1 = $2 ]]; then
 		error_message="Expected '$1' to be '$2'."
 
