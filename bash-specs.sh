@@ -60,9 +60,9 @@ it() {
 
 		printf '%s  %s\n' "$red_color" "$1"
 
-		if [[ $error_message ]]; then
+		if [[ -z $error_message ]]; then
 			printf '    %s\n' "$error_message"
-			unset -v error_message
+			error_message=''
 		fi
 	fi
 
@@ -96,16 +96,15 @@ read -d '' version <<- EOF
 	bash-specs $version_number
 EOF
 
-red_color=$(tput setaf 1)
-green_color=$(tput setaf 2)
-cyan_color=$(tput setaf 6)
-default_color=$(tput setaf 9)
+readonly red_color=$(tput setaf 1)
+readonly green_color=$(tput setaf 2)
+readonly cyan_color=$(tput setaf 6)
+readonly default_color=$(tput setaf 9)
 
 number_of_specs=0
 number_of_specs_failed=0
 
 error_message=''
-error_message_set=1
 
 (($# == 0)) && set -- *.suite
 
