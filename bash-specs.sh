@@ -47,14 +47,22 @@ string_is_equal_to() {
 it() {
 	before_each
 
+  local start=$(date +%s%N)
+
 	eval "$2"
+
+  local elapsed_time=$(($(date +%s%N) - start))
+  ((total_elapsed_time += elapsed_time))
 
 	local result=$?
 
 	((number_of_specs++))
 
+  local elapsed_time_in_ms=$((elapsed_time / 1000000))
+
 	if ((result == 0)); then
-		printf '%s  %s%s (0.000s)\n' "$green_color" "$1" "$cyan_color"
+    print_test_result "$color_green" "$1" "$elapsed_time_in_ms"
+		printf '%s  %s%s (%d.%ds)\n' "$green_color" "$1" "$cyan_color" "$((elapsed_time_in_ms / 1000))" "${elapsed_time_in_ms:-3}"
 	else
 		((number_of_specs_failed++))
 
@@ -71,6 +79,10 @@ it() {
 
 xit() {
 	:
+}
+
+print_test_result() {
+  printf '%s %s%s (%d.%d)\n' "$green_color" "$1" "$cyan_color" "$(())"
 }
 
 print_summary() {
@@ -103,6 +115,7 @@ readonly default_color=$(tput setaf 9)
 
 number_of_specs=0
 number_of_specs_failed=0
+total_elapsed_time=0
 
 error_message=''
 
