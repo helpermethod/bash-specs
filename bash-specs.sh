@@ -84,10 +84,6 @@ xit() {
 	:
 }
 
-print_test_result() {
-  printf '%s %s%s (%d.%d)\n' "$green_color" "$1" "$cyan_color" "$(())"
-}
-
 print_summary() {
 	((number_of_specs == 1)) && local units='spec' || local units='specs'
 	((number_of_specs_failed == 0)) && local color=$green_color || local color=$red_color
