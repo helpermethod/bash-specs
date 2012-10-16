@@ -44,29 +44,32 @@ string_is_equal_to() {
 	fi
 }
 
+print_test_result() {
+	local elapsed_time_in_ms=$(($3 / 1000000))
+
+	printf '%s  %s%s (%d.%03d s)\n' "$1" "$2" "$cyan_color" "$((elapsed_time_in_ms / 1000))" "$((elapsed_time_in_ms % 1000))"
+}
+
 it() {
 	before_each
 
-  local start=$(date +%s%N)
+	local start=$(date +%s%N)
 
 	eval "$2"
 
-  local elapsed_time=$(($(date +%s%N) - start))
-  ((total_elapsed_time += elapsed_time))
+	local elapsed_time=$(($(date +%s%N) - start))
+	((total_elapsed_time += elapsed_time))
 
 	local result=$?
 
 	((number_of_specs++))
 
-  local elapsed_time_in_ms=$((elapsed_time / 1000000))
-
 	if ((result == 0)); then
-    print_test_result "$color_green" "$1" "$elapsed_time_in_ms"
-		printf '%s  %s%s (%d.%ds)\n' "$green_color" "$1" "$cyan_color" "$((elapsed_time_in_ms / 1000))" "${elapsed_time_in_ms:-3}"
+		print_test_result "$green_color" "$1" "$elapsed_time"
 	else
 		((number_of_specs_failed++))
 
-		printf '%s  %s\n' "$red_color" "$1"
+                print_test_result "$red_color" "$1" "$elapsed_time"
 
 		if [[ -z $error_message ]]; then
 			printf '    %s\n' "$error_message"
