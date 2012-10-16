@@ -44,7 +44,7 @@ string_is_equal_to() {
 	fi
 }
 
-print_test_result() {
+print_spec_result() {
 	local elapsed_time_in_ms=$(($3 / 1000000))
 
 	printf '%s  %s%s (%d.%03d s)\n' "$1" "$2" "$cyan_color" "$((elapsed_time_in_ms / 1000))" "$((elapsed_time_in_ms % 1000))"
