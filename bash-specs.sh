@@ -44,32 +44,21 @@ string_is_equal_to() {
 	fi
 }
 
-print_spec_result() {
-	local elapsed_time_in_ms=$(($3 / 1000000))
-
-	printf '%s  %s%s (%d.%03d s)\n' "$1" "$2" "$cyan_color" "$((elapsed_time_in_ms / 1000))" "$((elapsed_time_in_ms % 1000))"
-}
-
 it() {
 	before_each
 
-	local start=$(date +%s%N)
-
-	eval "$2"
-
-	local elapsed_time=$(($(date +%s%N) - start))
-	((total_elapsed_time += elapsed_time))
-
+	local elapsed_time=$({time eval "$2" > /dev/null 2> /dev/null } 2>&1})
 	local result=$?
 
 	((number_of_specs++))
+	((total_elapsed_time += elapsed_time))
 
 	if ((result == 0)); then
-		print_test_result "$green_color" "$1" "$elapsed_time"
+		print_spec_result "$green_color" "$1" "$elapsed_time"
 	else
 		((number_of_specs_failed++))
 
-                print_test_result "$red_color" "$1" "$elapsed_time"
+                print_spec_result "$red_color" "$1" "$elapsed_time"
 
 		if [[ -z $error_message ]]; then
 			printf '    %s\n' "$error_message"
@@ -80,6 +69,10 @@ it() {
 	after_each
 }
 
+print_spec_result() {
+	printf '%s  %s%s (%d s)\n' "$1" "$2" "$cyan_color" "$elapsed_time"
+}
+
 xit() {
 	:
 }
@@ -88,7 +81,7 @@ print_summary() {
 	((number_of_specs == 1)) && local units='spec' || local units='specs'
 	((number_of_specs_failed == 0)) && local color=$green_color || local color=$red_color
 
-	printf '\n%s%s %s, %s failed%s (0.000s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan_color" "$default_color"
+	printf '\n%s%s %s, %s failed%s (%d.%d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan_color" "$default_color" "$((total_elapsed_time / 1000))" "$((total_elapsed_time % 1000))"
 }
 
 execute_suites() {
@@ -114,6 +107,7 @@ readonly default_color=$(tput setaf 9)
 
 number_of_specs=0
 number_of_specs_failed=0
+
 total_elapsed_time=0
 
 error_message=''
