@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
 describe() {
-	printf '%s%s\n' "$default_color" "$1"
+	printf '\n%s%s\n' "$default" "$1"
 }
 
 before_each() {
@@ -47,18 +47,18 @@ string_is_equal_to() {
 it() {
 	before_each
 
-	local elapsed_time=$({time eval "$2" > /dev/null 2> /dev/null } 2>&1})
+	local elapsed_time=$({ time eval "$2" > /dev/null 2>&1; } 2>&1)
 	local result=$?
 
 	((number_of_specs++))
-	((total_elapsed_time += elapsed_time))
+	((total_elapsed_time += 10#${elapsed_time/./}))
 
 	if ((result == 0)); then
-		print_spec_result "$green_color" "$1" "$elapsed_time"
+		print_spec_result "$green" "$1" "$elapsed_time"
 	else
 		((number_of_specs_failed++))
 
-                print_spec_result "$red_color" "$1" "$elapsed_time"
+		print_spec_result "$red" "$1" "$elapsed_time"
 
 		if [[ -z $error_message ]]; then
 			printf '    %s\n' "$error_message"
@@ -70,7 +70,7 @@ it() {
 }
 
 print_spec_result() {
-	printf '%s  %s%s (%d s)\n' "$1" "$2" "$cyan_color" "$elapsed_time"
+	printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan" "$elapsed_time"
 }
 
 xit() {
@@ -79,13 +79,13 @@ xit() {
 
 print_summary() {
 	((number_of_specs == 1)) && local units='spec' || local units='specs'
-	((number_of_specs_failed == 0)) && local color=$green_color || local color=$red_color
+	((number_of_specs_failed == 0)) && local color=$green || local color=$red
 
-	printf '\n%s%s %s, %s failed%s (%d.%d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan_color" "$default_color" "$((total_elapsed_time / 1000))" "$((total_elapsed_time % 1000))"
+	printf "\n%s%s %s, %s failed%s (%d.%03d s)%s\n" "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan" "$((total_elapsed_time / 1000))" "$((total_elapsed_time % 1000))" "$default"
 }
 
 execute_suites() {
-	printf '%s\n\n' "$version"
+	printf '%s\n' "$version"
 
 	for suite; do
 		. "$suite"
@@ -94,16 +94,19 @@ execute_suites() {
 	print_summary
 }
 
+LC_NUMERIC='C'
+TIMEFORMAT='%R'
+
 version_number=1.0.0
 
 read -d '' version <<- EOF
 	bash-specs $version_number
 EOF
 
-readonly red_color=$(tput setaf 1)
-readonly green_color=$(tput setaf 2)
-readonly cyan_color=$(tput setaf 6)
-readonly default_color=$(tput setaf 9)
+readonly red=$(tput setaf 1)
+readonly green=$(tput setaf 2)
+readonly cyan=$(tput setaf 6)
+readonly default=$(tput setaf 9)
 
 number_of_specs=0
 number_of_specs_failed=0
