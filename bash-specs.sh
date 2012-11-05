@@ -47,7 +47,8 @@ string_is_equal_to() {
 it() {
 	before_each
 
-	local elapsed_time=$({ time eval "$2" > /dev/null 2>&1; } 2>&1)
+	local elapsed_time
+	elapsed_time=$({ time eval "$2" > /dev/null 2>&1; } 2>&1)
 	local result=$?
 
 	((number_of_specs++))
