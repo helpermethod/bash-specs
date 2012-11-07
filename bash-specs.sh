@@ -1,5 +1,25 @@
 #/usr/bin/env bash
 
+shopt -s nullglob
+
+readonly version_number=1.0.0
+
+read -d '' version <<- EOF
+	bash-specs $version_number
+EOF
+
+readonly red=$(tput setaf 1)
+readonly green=$(tput setaf 2)
+readonly cyan=$(tput setaf 6)
+readonly default=$(tput setaf 9)
+
+number_of_specs=0
+number_of_specs_failed=0
+
+total_elapsed_time=0
+
+error_message=''
+
 describe() {
 	printf '\n%s%s\n' "$default" "$1"
 }
@@ -86,6 +106,8 @@ print_summary() {
 }
 
 execute_suites() {
+	(($# == 0)) && set -- *.suite
+
 	printf '%s\n' "$version"
 
 	for suite; do
@@ -94,28 +116,5 @@ execute_suites() {
 
 	print_summary
 }
-
-LC_NUMERIC='C'
-TIMEFORMAT='%R'
-
-version_number=1.0.0
-
-read -d '' version <<- EOF
-	bash-specs $version_number
-EOF
-
-readonly red=$(tput setaf 1)
-readonly green=$(tput setaf 2)
-readonly cyan=$(tput setaf 6)
-readonly default=$(tput setaf 9)
-
-number_of_specs=0
-number_of_specs_failed=0
-
-total_elapsed_time=0
-
-error_message=''
-
-(($# == 0)) && set -- *.suite
 
 execute_suites "$@"

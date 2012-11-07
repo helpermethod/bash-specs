@@ -1,0 +1,4 @@
+#!/bin/sh
+LC_NUMERIC='C' TIMEFORMAT='%R' ./_bash-specs.sh
+
+
