@@ -1,0 +1,9 @@
+describe 'A unicorn'
+
+it 'should be equal to itself' '{
+	string_is_equal_to 'unicorn' 'unicorn'
+}'
+
+it 'should not be equal to a pony' '{
+	! string_is_equal_to 'unicorn' 'pony'
+}'
