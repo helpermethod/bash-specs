@@ -1,2 +1,4 @@
-bash-specs
-==========
+# bash-specs
+
+
+## Installation
