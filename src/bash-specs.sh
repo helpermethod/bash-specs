@@ -35,6 +35,18 @@ total_elapsed_time=0
 
 error_message=''
 
+main() {
+	(($# == 0)) && set -- *.suite
+
+	printf '%s\n' "$version"
+
+	for suite; do
+		. "$suite"
+	done
+
+	print_summary
+}
+
 describe() {
 	printf '\n%s%s\n' "$default" "$1"
 }
@@ -72,7 +84,7 @@ integer_is_greater_than() {
 }
 
 string_is_equal_to() {
-	if [[ ! $1 = $2 ]]; then
+	if [[ ! $1 == $2 ]]; then
 		error_message="Expected '$1' to be '$2'."
 
 		return 1
@@ -125,19 +137,8 @@ print_summary() {
 	((number_of_specs == 1)) && local units='spec' || local units='specs'
 	((number_of_specs_failed == 0)) && local color=$green || local color=$red
 
-	printf "\n%s%s %s, %s failed%s (%d.%03d s)%s\n" "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan" "$((total_elapsed_time / 1000))" "$((total_elapsed_time % 1000))" "$default"
+	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan" "$((total_elapsed_time / 1000))" "$((total_elapsed_time % 1000))" "$default"
 }
 
-execute_suites() {
-	(($# == 0)) && set -- *.suite
 
-	printf '%s\n' "$version"
-
-	for suite; do
-		. "$suite"
-	done
-
-	print_summary
-}
-
-execute_suites "$@"
+main "$@"
