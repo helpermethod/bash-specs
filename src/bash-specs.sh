@@ -17,7 +17,7 @@
 
 shopt -s nullglob
 
-readonly version_number=1.0.0
+readonly version_number='1.0.0'
 
 read -d '' version <<- EOF
 	bash-specs $version_number
