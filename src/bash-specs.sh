@@ -121,7 +121,7 @@ xit() {
 	:
 }
 
-print_spec_result() {
+__print_spec_result() {
 	printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan" "$elapsed_time"
 }
 
@@ -133,7 +133,7 @@ after_each() {
 	:
 }
 
-print_summary() {
+__print_summary() {
 	((number_of_specs == 1)) && local units='spec' || local units='specs'
 	((number_of_specs_failed == 0)) && local color=$green || local color=$red
 
