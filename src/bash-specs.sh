@@ -28,10 +28,10 @@ readonly green=$(tput setaf 2)
 readonly cyan=$(tput setaf 6)
 readonly default=$(tput setaf 9)
 
-number_of_specs=0
-number_of_specs_failed=0
+number_of_specs='0'
+number_of_specs_failed='0'
 
-total_elapsed_time=0
+total_elapsed_time='0'
 
 error_message=''
 
