@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 # Copyright (C) 2012 Oliver Weiler
 #
@@ -23,10 +23,10 @@ read -d '' version <<- EOF
 	bash-specs $version_number
 EOF
 
-readonly red=$(tput setaf 1)
-readonly green=$(tput setaf 2)
-readonly cyan=$(tput setaf 6)
-readonly default=$(tput setaf 9)
+readonly red_color=$(tput setaf 1)
+readonly green_color=$(tput setaf 2)
+readonly cyan_color=$(tput setaf 6)
+readonly default_color=$(tput setaf 9)
 
 number_of_specs='0'
 number_of_specs_failed='0'
@@ -44,7 +44,7 @@ main() {
 		. "$suite"
 	done
 
-	print_summary
+	__print_summary
 }
 
 describe() {
@@ -94,6 +94,12 @@ string_is_equal_to() {
 it() {
 	before_each
 
+	__execute_spec "$@"
+
+	after_each
+}
+
+__execute_spec() {
 	local elapsed_time
 	elapsed_time=$({ time eval "$2" > /dev/null 2>&1; } 2>&1)
 	local result=$?
@@ -102,19 +108,17 @@ it() {
 	((total_elapsed_time += 10#${elapsed_time/./}))
 
 	if ((result == 0)); then
-		print_spec_result "$green" "$1" "$elapsed_time"
+		__print_spec_result "$green" "$1" "$elapsed_time"
 	else
 		((number_of_specs_failed++))
 
-		print_spec_result "$red" "$1" "$elapsed_time"
+		__print_spec_result "$red" "$1" "$elapsed_time"
 
 		if [[ -z $error_message ]]; then
 			printf '    %s\n' "$error_message"
 			error_message=''
 		fi
 	fi
-
-	after_each
 }
 
 xit() {
@@ -125,11 +129,11 @@ __print_spec_result() {
 	printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan" "$elapsed_time"
 }
 
-after() {
+after_each() {
 	:
 }
 
-after_each() {
+after() {
 	:
 }
 
@@ -139,6 +143,5 @@ __print_summary() {
 
 	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan" "$((total_elapsed_time / 1000))" "$((total_elapsed_time % 1000))" "$default"
 }
-
 
 main "$@"
