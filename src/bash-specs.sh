@@ -31,8 +31,6 @@ readonly default_color=$(tput setaf 9)
 number_of_specs='0'
 number_of_specs_failed='0'
 
-total_elapsed_time='0'
-
 error_message=''
 
 main() {
@@ -60,7 +58,7 @@ before_each() {
 }
 
 integer_is_equal_to() {
-	if ((! $1 == $2)); then
+	if (($1 != $2)); then
 		error_message="Expected '$1' to be '$2'."
 
 		return 1
@@ -68,7 +66,7 @@ integer_is_equal_to() {
 }
 
 integer_is_less_than() {
-	if ((! $1 < $2)); then
+	if ! (($1 < $2)); then
 		error_message="Expected '$1' to be less than '$2'."
 
 		return 1
@@ -76,7 +74,7 @@ integer_is_less_than() {
 }
 
 integer_is_greater_than() {
-	if ((! $1 > $2)); then
+	if ! (($1 > $2)); then
 		error_message="Expected '$1' to be greater than '$2'."
 
 		return 1
@@ -84,7 +82,7 @@ integer_is_greater_than() {
 }
 
 string_is_equal_to() {
-	if [[ ! $1 == $2 ]]; then
+	if [[ $1 != $2 ]]; then
 		error_message="Expected '$1' to be '$2'."
 
 		return 1
@@ -100,29 +98,29 @@ it() {
 }
 
 __execute_spec() {
-	local elapsed_time
-	elapsed_time=$({ time eval "$2" > /dev/null 2>&1; } 2>&1)
+	eval "$2" > /dev/null 2>&1
 	local result=$?
 
 	((number_of_specs++))
-	((total_elapsed_time += 10#${elapsed_time/./}))
 
 	if ((result == 0)); then
-		__print_spec_result "$green_color" "$1" "$elapsed_time"
-	else
-		((number_of_specs_failed++))
+		__print_spec_result "$green_color" "$1"
 
-		__print_spec_result "$red_color" "$1" "$elapsed_time"
+		return 0
+  fi
 
-		if [[ -n $error_message ]]; then
-			printf '    %s\n' "$error_message"
-			error_message=''
-		fi
+	((number_of_specs_failed++))
+
+	__print_spec_result "$red_color" "$1"
+
+	if [[ -n $error_message ]]; then
+		printf '    %s\n' "$error_message"
+		error_message=''
 	fi
 }
 
 __print_spec_result() {
-	printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan_color" "$elapsed_time"
+	printf '%s  %s\n' "$1" "$2"
 }
 
 xit() {
@@ -141,7 +139,7 @@ __print_summary() {
 	((number_of_specs == 1)) && local units='spec' || local units='specs'
 	((number_of_specs_failed == 0)) && local color=$green_color || local color=$red_color
 
-	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan_color" "$((total_elapsed_time / 1000))" "$((total_elapsed_time % 1000))" "$default_color"
+	printf '\n%s%s %s, %s failed%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$default_color"
 }
 
 main "$@"
