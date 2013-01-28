@@ -5,7 +5,7 @@ it 'should be less than the number 42' '{
 }'
 
 it 'should be equal to itself' '{
-	integer_is_equal_to 21 21
+	integer_is_equal_to 22 21
 }'
 
 it 'should be greater than the number 13' '{

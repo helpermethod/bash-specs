@@ -48,7 +48,7 @@ main() {
 }
 
 describe() {
-	printf '\n%s%s\n' "$default" "$1"
+	printf '\n%s%s\n' "$default_color" "$1"
 }
 
 before() {
@@ -108,25 +108,25 @@ __execute_spec() {
 	((total_elapsed_time += 10#${elapsed_time/./}))
 
 	if ((result == 0)); then
-		__print_spec_result "$green" "$1" "$elapsed_time"
+		__print_spec_result "$green_color" "$1" "$elapsed_time"
 	else
 		((number_of_specs_failed++))
 
-		__print_spec_result "$red" "$1" "$elapsed_time"
+		__print_spec_result "$red_color" "$1" "$elapsed_time"
 
-		if [[ -z $error_message ]]; then
+		if [[ -n $error_message ]]; then
 			printf '    %s\n' "$error_message"
 			error_message=''
 		fi
 	fi
 }
 
-xit() {
-	:
+__print_spec_result() {
+	printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan_color" "$elapsed_time"
 }
 
-__print_spec_result() {
-	printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan" "$elapsed_time"
+xit() {
+	:
 }
 
 after_each() {
@@ -139,9 +139,9 @@ after() {
 
 __print_summary() {
 	((number_of_specs == 1)) && local units='spec' || local units='specs'
-	((number_of_specs_failed == 0)) && local color=$green || local color=$red
+	((number_of_specs_failed == 0)) && local color=$green_color || local color=$red_color
 
-	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan" "$((total_elapsed_time / 1000))" "$((total_elapsed_time % 1000))" "$default"
+	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan_color" "$((total_elapsed_time / 1000))" "$((total_elapsed_time % 1000))" "$default_color"
 }
 
 main "$@"
