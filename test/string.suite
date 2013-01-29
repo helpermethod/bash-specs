@@ -1,9 +1,13 @@
 describe 'A unicorn'
 
 it 'should be equal to itself' '{
-	string_is_equal_to 'unicorn' 'unicorn'
+	string_equals 'unicorn' 'unicorn'
 }'
 
 it 'should not be equal to a pony' '{
-	! string_is_equal_to 'unicorn' 'pony'
+	! string_equals 'unicorn' 'pony'
+}'
+
+it 'should end with the word corn' '{
+	string_matches 'unicorn' '^.*corn$'
 }'

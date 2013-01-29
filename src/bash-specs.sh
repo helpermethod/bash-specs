@@ -57,7 +57,7 @@ before_each() {
 	:
 }
 
-integer_is_equal_to() {
+integer_equals() {
 	if (($1 != $2)); then
 		error_message="Expected '$1' to be '$2'."
 
@@ -81,9 +81,17 @@ integer_is_greater_than() {
 	fi
 }
 
-string_is_equal_to() {
+string_equals() {
 	if [[ $1 != $2 ]]; then
-		error_message="Expected '$1' to be '$2'."
+		error_message="Expected '$1' to be equal to '$2'."
+
+		return 1
+	fi
+}
+
+string_matches() {
+	if ! [[ $1 =~ $2 ]]; then
+		error_message="Expected '$1' to match '$2'."
 
 		return 1
 	fi
