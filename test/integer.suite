@@ -1,0 +1,13 @@
+describe 'The number 21'
+
+it 'should be less than the number 42' '{
+	integer_is_less_than 21 42
+}'
+
+it 'should be equal to itself' '{
+	integer_equals 21 21
+}'
+
+it 'should be greater than the number 13' '{
+	integer_is_greater_than 21 13
+}'
