@@ -114,7 +114,7 @@ it() {
 }
 
 __execute_spec() {
-	{ time eval "$2" > /dev/null 2>&1; } 2 > "$dump_file"
+	{ time eval "$2" > /dev/null 2>&1; } 2> "$dump_file"
 	local result=$?
 
 	((number_of_specs++))
@@ -130,7 +130,7 @@ __execute_spec() {
 		return
 	fi
 
-	((number_of_specs_failed++)
+	((number_of_specs_failed++))
 
 	__print_spec_result "$red_color" "$1" "$elapsed_time"
 
