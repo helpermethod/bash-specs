@@ -145,7 +145,7 @@ __accumulate_total_elapsed_time() {
 }
 
 __print_spec_result() {
-	printf '%s  %s\n' "$1" "$2"
+	printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan_color" "$3"
 }
 
 xit() {
@@ -164,7 +164,7 @@ __print_summary() {
 	((number_of_specs == 1)) && local units='spec' || local units='specs'
 	((number_of_specs_failed == 0)) && local color=$green_color || local color=$red_color
 
-	printf '\n%s%s %s, %s failed%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$default_color"
+	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan_color" "$((total_elapsed_time / 1000))" "$((total_elapsed_time % 1000))" "$default_color"
 }
 
 main "$@"
