@@ -1,0 +1,13 @@
+describe 'A failed spec'
+
+before_each() {
+	touch test.tmp
+}
+
+after_each() {
+	rm test.tmp
+}
+
+it 'should not leave temporay files' '{
+	exit 1
+}'

@@ -1,0 +1,13 @@
+describe 'A pony'
+
+it 'should sleep for at least one second' '{
+	sleep 1
+}'
+
+it 'should sleep for at least two seconds' '{
+	sleep 2
+}'
+
+it 'should sleep for at least four seconds' '{
+	sleep 4
+}'
