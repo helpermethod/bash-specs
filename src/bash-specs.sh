@@ -17,6 +17,8 @@
 
 shopt -s nullglob
 
+: ${TMPDIR:=/tmp}
+
 readonly version_number='1.0.0'
 
 read -d '' version <<- EOF
@@ -28,12 +30,8 @@ readonly green_color=$(tput setaf 2)
 readonly cyan_color=$(tput setaf 6)
 readonly default_color=$(tput setaf 9)
 
-: ${TMPDIR:=/tmp}
-
-readonly temporary_directory="/$TMPDIR/$RANDOM.$RANDOM.$$"
-readonly sandbox="/$TMPDIR/$RANDOM.$RANDOM.$$"
-
-readonly elapsed_time_file='$temporary_directory/elapsed_time.out'
+readonly temp_dir="/$TMPDIR/$RANDOM.$RANDOM.$$"
+readonly elapsed_time_store='$temporary_directory/elapsed_time.out'
 
 number_of_specs='0'
 number_of_specs_failed='0'
@@ -64,17 +62,22 @@ describe() {
 	printf '\n%s%s\n' "$default_color" "$1"
 }
 
+create_sandbox() {
+  readonly sandbox="/$TMPDIR/$RANDOM.$RANDOM.$$"
+  mkdir -m 700 "$sandbox"
+}
+
+before() {
+	:
+}
+
 before_each() {
 	:
 }
 
-create_sandbox() {
-  mkdir -m 700 "$sandbox"
-}
-
 integer_equals() {
 	if (($1 != $2)); then
-		error_message="Expected '$1' to be '$2'."
+		err_msg="Expected '$1' to be '$2'."
 
 		return 1
 	fi
@@ -82,7 +85,7 @@ integer_equals() {
 
 integer_is_less_than() {
 	if ! (($1 < $2)); then
-		error_message="Expected '$1' to be less than '$2'."
+		err_msg="Expected '$1' to be less than '$2'."
 
 		return 1
 	fi
@@ -90,7 +93,7 @@ integer_is_less_than() {
 
 integer_is_greater_than() {
 	if ! (($1 > $2)); then
-		error_message="Expected '$1' to be greater than '$2'."
+		err_msg="Expected '$1' to be greater than '$2'."
 
 		return 1
 	fi
@@ -98,7 +101,7 @@ integer_is_greater_than() {
 
 string_equals() {
 	if [[ $1 != $2 ]]; then
-		error_message="Expected '$1' to be equal to '$2'."
+		err_msg="Expected '$1' to be equal to '$2'."
 
 		return 1
 	fi
@@ -106,7 +109,7 @@ string_equals() {
 
 string_matches() {
 	if ! [[ $1 =~ $2 ]]; then
-		error_message="Expected '$1' to match '$2'."
+		err_msg="Expected '$1' to match '$2'."
 
 		return 1
 	fi
@@ -141,9 +144,9 @@ __execute_spec() {
 
 	__print_spec_result "$red_color" "$1" "$elapsed_time"
 
-	if [[ -n $error_message ]]; then
-		printf '    %s\n' "$error_message"
-		error_message=''
+	if [[ -n $err_msg ]]; then
+		printf '    %s\n' "$err_msg"
+		err_msg=''
 	fi
 }
 
@@ -163,6 +166,10 @@ after_each() {
 	:
 }
 
+after() {
+	:
+}
+
 __cleanup_int() {
 	__cleanup_exit
 	trap -- INT
@@ -170,8 +177,8 @@ __cleanup_int() {
 }
 
 __cleanup_exit() {
-	rm -rf "$temporary_directory"
-  [[ -d $sandbox ]] && rm -rf "$sandbox"
+	rm -rf "$temp_dir"
+	[[ -d $sandbox ]] && rm -rf "$sandbox"
 
 	tput init
 }
@@ -181,10 +188,10 @@ __print_summary() {
 	((number_of_specs == 1)) && units='spec' || units='specs'
 	local color
 	((number_of_specs_failed == 0)) && color=$green_color || color=$red_color
-	local seconds=$((total_elapsed_time / 1000))
-	local milliseconds=$((total_elapsed_time % 1000))
+	local secs=$((total_elapsed_time / 1000))
+	local millisecs=$((total_elapsed_time % 1000))
 
-	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan_color" "$seconds" "$milliseconds" "$default_color"
+	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan_color" "$secs" "$millisecs" "$default_color"
 }
 
 main "$@"
