@@ -76,7 +76,7 @@ setup_sandbox() {
 	sandbox="/$TMPDIR/$RANDOM.$RANDOM.$$"
 	mkdir -m 700 "$sandbox"
 
-	[[ ! -d "$sandbox ]] && exit 1
+	[[ ! -d "$sandbox" ]] && exit 1
 }
 
 integer_equals() {
