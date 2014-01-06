@@ -43,12 +43,12 @@ total_elapsed_time='0'
 error_message=''
 
 main() {
-	(( $# == 0 )) && set -- *.suite
+	(($# == 0)) && set -- *.suite
 
 	printf '%s\n' "$version"
 
 	mkdir -m 700 "$temp_dir"
-	(( $? != 0 )) && exit 1
+	(($? != 0)) && exit 1
 
 	trap '__cleanup_int' INT
 	trap '__cleanup_exit' EXIT
@@ -80,7 +80,7 @@ setup_sandbox() {
 }
 
 integer_equals() {
-	if (( $1 != $2 )); then
+	if (($1 != $2)); then
 		err_msg="Expected '$1' to be '$2'."
 
 		return 1
@@ -88,7 +88,7 @@ integer_equals() {
 }
 
 integer_is_less_than() {
-	if ! (( $1 < $2 )); then
+	if ! (($1 < $2)); then
 		err_msg="Expected '$1' to be less than '$2'."
 
 		return 1
@@ -96,7 +96,7 @@ integer_is_less_than() {
 }
 
 integer_is_greater_than() {
-	if ! (( $1 > $2 )); then
+	if ! (($1 > $2)); then
 		err_msg="Expected '$1' to be greater than '$2'."
 
 		return 1
@@ -155,7 +155,7 @@ __execute_spec() {
 }
 
 __accumulate_total_elapsed_time() {
-	(( total_elapsed_time += 10#${elapsed_time/./} ))
+	((total_elapsed_time += 10#${elapsed_time/./}))
 }
 
 __print_spec_result() {
@@ -193,11 +193,11 @@ __cleanup_exit() {
 
 __print_summary() {
 	local units
-	(( number_of_specs == 1 )) && units='spec' || units='specs'
+	((number_of_specs == 1)) && units='spec' || units='specs'
 	local color
-	(( number_of_specs_failed == 0 )) && color=$green_color || color=$red_color
-	local secs=$(( total_elapsed_time / 1000 ))
-	local millisecs=$(( total_elapsed_time % 1000 ))
+	((number_of_specs_failed == 0)) && color=$green_color || color=$red_color
+	local secs=$((total_elapsed_time / 1000))
+	local millisecs=$((total_elapsed_time % 1000))
 
 	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan_color" "$secs" "$millisecs" "$default_color"
 }
