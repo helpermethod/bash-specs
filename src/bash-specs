@@ -131,7 +131,7 @@ __execute_spec() {
 	{ time eval "$2" > /dev/null 2>&1; } 2> "$elapsed_time_file"
 	local result=$?
 
-	(( number_of_specs++ ))
+	((number_of_specs++))
 
 	local elapsed_time
 	read elapsed_time < "$dump_file"
