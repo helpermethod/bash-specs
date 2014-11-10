@@ -32,22 +32,22 @@ readonly green_color=$(tput setaf 2)
 readonly cyan_color=$(tput setaf 6)
 readonly default_color=$(tput setaf 9)
 
-readonly temp_dir="/$TMPDIR/$RANDOM.$RANDOM.$$"
-readonly elapsed_time_store='$temp_dir/elapsed_time.out'
+readonly tmp_dir="/$TMPDIR/$RANDOM.$RANDOM.$$"
+readonly elapsed_time_fh='$tmp_dir/elapsed_time.out'
 
 number_of_specs='0'
 number_of_specs_failed='0'
 
 total_elapsed_time='0'
 
-err_message=''
+err_msg=''
 
 main() {
 	(($# == 0)) && set -- *.suite
 
 	printf '%s\n' "$version"
 
-	mkdir -m 700 "$temp_dir"
+	mkdir -m 700 "$tmp_dir"
 	(($? != 0)) && exit 1
 
 	trap '__cleanup_int' INT
@@ -121,13 +121,13 @@ it() {
 }
 
 __execute_spec() {
-	{ time eval "$2" > /dev/null 2>&1; } 2> "$elapsed_time_file"
+	{ time eval "$2" > /dev/null 2>&1; } 2> "$elapsed_time_fh"
 	local result=$?
 
 	((number_of_specs++))
 
 	local elapsed_time
-	read elapsed_time < "$dump_file"
+	read elapsed_time < "$elapsed_time_fh"
 
 	__accumulate_total_elapsed_time "$elapsed_time"
 
@@ -174,8 +174,7 @@ __cleanup_int() {
 }
 
 __cleanup_exit() {
-	rm -rf "$temp_dir"
-	[[ -d $sandbox ]] && rm -rf "$sandbox"
+	rm -rf "$tmp_dir"
 
 	tput init
 }
