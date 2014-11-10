@@ -72,13 +72,6 @@ before_each() {
 	:
 }
 
-setup_sandbox() {
-	sandbox="/$TMPDIR/$RANDOM.$RANDOM.$$"
-	mkdir -m 700 "$sandbox"
-
-	[[ ! -d "$sandbox" ]] && exit 1
-}
-
 integer_equals() {
 	if (($1 != $2)); then
 		err_msg="Expected '$1' to be '$2'."
@@ -172,10 +165,6 @@ after_each() {
 
 after() {
 	:
-}
-
-teardown_sandbox() {
-	[[ -n $sandbox ]] && rm -rf "$sandbox"
 }
 
 __cleanup_int() {
