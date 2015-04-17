@@ -1,13 +1,19 @@
 describe 'A unicorn'
 
-it 'should be equal to itself' '{
-	string_equals 'unicorn' 'unicorn'
-}'
+_() {
+        string_equals 'unicorn' 'unicorn '  
+}
 
-it 'should not be equal to a pony' '{
-	! string_equals 'unicorn' 'pony'
-}'
+it 'should be equal to itself' "$_"
 
-it 'should end with the word corn' '{
-	string_matches 'unicorn' '^.*corn$'
-}'
+_() {
+        ! string_equals 'unicorn' 'pony'
+}
+
+it 'should not be equal to a pony' "$_"
+
+_() {
+        string_matches 'unicorn ' '^.*corn$'
+}
+
+it 'should end with the word corn' "$_"
