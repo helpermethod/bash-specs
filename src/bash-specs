@@ -19,7 +19,6 @@ shopt -s nullglob
 
 LC_NUMERIC='C'
 TIMEFORMAT='%R'
-: ${TMPDIR:=/tmp}
 
 readonly version_number='1.0.0'
 
@@ -31,9 +30,6 @@ readonly red_color=$(tput setaf 1)
 readonly green_color=$(tput setaf 2)
 readonly cyan_color=$(tput setaf 6)
 readonly default_color=$(tput setaf 9)
-
-readonly tmp_dir="/$TMPDIR/$RANDOM.$RANDOM.$$"
-readonly elapsed_time_fh='$tmp_dir/elapsed_time.out'
 
 number_of_specs='0'
 number_of_specs_failed='0'
@@ -47,11 +43,7 @@ main() {
 
 	printf '%s\n' "$version"
 
-	mkdir -m 700 "$tmp_dir"
-	(($? != 0)) && exit 1
-
 	trap '__cleanup_int' INT
-	trap '__cleanup_exit' EXIT
 
 	for suite; do
 		. "$suite"
