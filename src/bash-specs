@@ -19,6 +19,7 @@ shopt -s nullglob
 
 LC_NUMERIC='C'
 TIMEFORMAT='%R'
+: ${TMPDIR:=/tmp}
 
 readonly version_number='1.0.0'
 
@@ -26,24 +27,27 @@ read -d '' version <<- EOF
 	bash-specs $version_number
 EOF
 
-readonly red_color=$(tput setaf 1)
-readonly green_color=$(tput setaf 2)
-readonly cyan_color=$(tput setaf 6)
+readonly red=$(tput setaf 1)
+readonly green=$(tput setaf 2)
+readonly cyan=$(tput setaf 6)
 readonly default_color=$(tput setaf 9)
+
+readonly tmp_dir="/$TMPDIR/$RANDOM.$RANDOM.$$"
+readonly elapsed_time_file="$tmp_dir/elapsed_time.out"
 
 number_of_specs='0'
 number_of_specs_failed='0'
 
 total_elapsed_time='0'
 
-err_msg=''
+error_message=''
 
 main() {
 	(($# == 0)) && set -- *.suite
 
 	printf '%s\n' "$version"
 
-	trap '__cleanup_int' INT
+        trap '__cleanup_exit' EXIT
 
 	for suite; do
 		. "$suite"
@@ -56,52 +60,54 @@ describe() {
 	printf '\n%s%s\n' "$default_color" "$1"
 }
 
-before() {
-	:
-}
-
 before_each() {
-	:
+        :
 }
 
-integer_equals() {
+expect() {
+        $2 $1 ${@:3}
+}
+
+to_equal() {
 	if (($1 != $2)); then
-		err_msg="Expected '$1' to be '$2'."
+		error_message="Expected '$1' to equal '$2'."
 
 		return 1
 	fi
 }
 
-integer_is_less_than() {
+to_be_less_than() {
 	if ! (($1 < $2)); then
-		err_msg="Expected '$1' to be less than '$2'."
+		error_message="Expected '$1' to be less than '$2'."
 
 		return 1
 	fi
 }
 
-integer_is_greater_than() {
+to_be_greater_than() {
 	if ! (($1 > $2)); then
-		err_msg="Expected '$1' to be greater than '$2'."
+		error_message="Expected '$1' to be greater than '$2'."
 
 		return 1
 	fi
 }
 
-string_equals() {
-	if [[ $1 != $2 ]]; then
-		err_msg="Expected '$1' to be equal to '$2'."
-
-		return 1
-	fi
+to_contain() {
+        if is_array $1; then
+          a
+        fi
 }
 
-string_matches() {
+to_match() {
 	if ! [[ $1 =~ $2 ]]; then
-		err_msg="Expected '$1' to match '$2'."
+		error_message="Expected '$1' to match '$2'."
 
 		return 1
 	fi
+}
+
+_is_array() {
+  # TODO
 }
 
 it() {
@@ -113,38 +119,36 @@ it() {
 }
 
 __execute_spec() {
-	{ time eval "$2" > /dev/null 2>&1; } 2> "$elapsed_time_fh"
+        # TODO
+        local elapsed_time=$({ time "$2"; } 2>&1)
 	local result=$?
 
 	((number_of_specs++))
 
-	local elapsed_time
-	read elapsed_time < "$elapsed_time_fh"
-
 	__accumulate_total_elapsed_time "$elapsed_time"
 
 	if ((result == 0)); then
-		__print_spec_result "$green_color" "$1" "$elapsed_time"
+		__print_spec_result "$green" "$1" "$elapsed_time"
 
 		return
 	fi
 
 	((number_of_specs_failed++))
 
-	__print_spec_result "$red_color" "$1" "$elapsed_time"
+	__print_spec_result "$red" "$1" "$elapsed_time"
 
-	if [[ -n $err_msg ]]; then
-		printf '    %s\n' "$err_msg"
-		err_msg=''
+	if [[ -n $error_message ]]; then
+		printf '    %s\n' "$error_message"
+		error_message=''
 	fi
 }
 
 __accumulate_total_elapsed_time() {
-	((total_elapsed_time += 10#${elapsed_time/./}))
+	((total_elapsed_time += 10#${1/./}))
 }
 
 __print_spec_result() {
-	printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan_color" "$3"
+	printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan" "$3"
 }
 
 xit() {
@@ -155,31 +159,19 @@ after_each() {
 	:
 }
 
-after() {
-	:
-}
-
-__cleanup_int() {
-	__cleanup_exit
-	trap -- INT
-	kill -INT $$
-}
-
 __cleanup_exit() {
-	rm -rf "$tmp_dir"
-
-	tput init
+        tput sgr0
 }
 
 __print_summary() {
 	local units
 	((number_of_specs == 1)) && units='spec' || units='specs'
 	local color
-	((number_of_specs_failed == 0)) && color=$green_color || color=$red_color
+	((number_of_specs_failed == 0)) && color=$green || color=$red
 	local secs=$((total_elapsed_time / 1000))
 	local millisecs=$((total_elapsed_time % 1000))
 
-	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan_color" "$secs" "$millisecs" "$default_color"
+	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan" "$secs" "$millisecs" "$default_color"
 }
 
 main "$@"
