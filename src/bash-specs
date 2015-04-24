@@ -19,7 +19,6 @@ shopt -s nullglob
 
 LC_NUMERIC='C'
 TIMEFORMAT='%R'
-: ${TMPDIR:=/tmp}
 
 readonly version_number='1.0.0'
 
@@ -31,9 +30,6 @@ readonly red=$(tput setaf 1)
 readonly green=$(tput setaf 2)
 readonly cyan=$(tput setaf 6)
 readonly default_color=$(tput setaf 9)
-
-readonly tmp_dir="/$TMPDIR/$RANDOM.$RANDOM.$$"
-readonly elapsed_time_file="$tmp_dir/elapsed_time.out"
 
 number_of_specs='0'
 number_of_specs_failed='0'
@@ -69,6 +65,11 @@ expect() {
 }
 
 to_equal() {
+        # TODO
+        if [[ $2 == 'not' ]]; then
+          :
+        fi
+
 	if (($1 != $2)); then
 		error_message="Expected '$1' to equal '$2'."
 
@@ -94,7 +95,8 @@ to_be_greater_than() {
 
 to_contain() {
         if is_array $1; then
-          a
+          # TODO delegate to function
+          :
         fi
 }
 
@@ -106,8 +108,12 @@ to_match() {
 	fi
 }
 
-_is_array() {
-  # TODO
+__is_array() {
+  [[ $(declare -p $1) == 'declare -a'* ]]
+}
+
+__is_associative_array() {
+  [[ $(declare -p $1) == 'declare -A'* ]]
 }
 
 it() {
@@ -119,11 +125,10 @@ it() {
 }
 
 __execute_spec() {
-        # TODO
-        local elapsed_time=$({ time "$2"; } 2>&1)
+        local elapsed_time=$({ time "$2" > /dev/null 2>&1; } 2>&1)
 	local result=$?
 
-	((number_of_specs++))
+        ((number_of_specs++))
 
 	__accumulate_total_elapsed_time "$elapsed_time"
 
@@ -134,7 +139,6 @@ __execute_spec() {
 	fi
 
 	((number_of_specs_failed++))
-
 	__print_spec_result "$red" "$1" "$elapsed_time"
 
 	if [[ -n $error_message ]]; then
@@ -152,7 +156,7 @@ __print_spec_result() {
 }
 
 xit() {
-	:
+  :
 }
 
 after_each() {
