@@ -31,9 +31,6 @@ readonly green=$(tput setaf 2)
 readonly cyan=$(tput setaf 6)
 readonly default_color=$(tput setaf 9)
 
-readonly array_type='-a'
-readonly associative_array_type='-A'
-
 number_of_specs='0'
 number_of_specs_failed='0'
 
@@ -68,34 +65,43 @@ expect() {
 }
 
 to_equal() {
-	if (($1 != $2)); then
-                __build_error_message "$1" "$FUNCNAME" "$2"
+        (($1 == $2)) && return 0
 
-		return 1
-	fi
+        __build_error_message "$1" "$FUNCNAME" "$2"
+
+        return 1
 }
 
 to_be_less_than() {
-	if ! (($1 < $2)); then
-                __build_error_message "$1" "$FUNCNAME" "$2"
+        (($1 < $2)) && return 0
 
-		return 1
-	fi
+        __build_error_message "$1" "$FUNCNAME" "$2"
+
+        return 1
 }
 
 to_be_greater_than() {
-	if ! (($1 > $2)); then
-                __build_error_message "$1" "$FUNCNAME" "$2"
+	(($1 > $2)) && return 0
 
-		return 1
-	fi
+        __build_error_message "$1" "$FUNCNAME" "$2"
+
+	return 1
 }
 
 to_contain() {
         if is_array $1; then
-          # TODO delegate to function
-          :
-        fi
+                for e in $1; do
+                  [[ $e == $2 ]] && return 0
+                done
+
+                __build_error_message "$1" "$FUNCNAME" "$2"
+
+                return 1
+        fi 
+
+        [[ $1 == *$2* ]] && return 0
+
+        __build_error_message "$1" "$FUNCNAME" "$2"
 }
 
 to_match() {
@@ -111,15 +117,7 @@ __build_error_message() {
 }
 
 __is_array() {
-        __is_type "$1" "$array_type"
-}
-
-__is_associative_array() {
-        __is_type "$1" "$associative_array_type"
-}
-
-__is_type() {
-        [[ $(declare -p $1) == "declare $2"* ]]
+        [[ $(declare -p $1) == "declare -a"* ]]
 }
 
 it() {
