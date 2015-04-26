@@ -1,13 +1,13 @@
 describe 'A unicorn'
 
 equals_self() {
-        expect 'unicorn' to_equal 'unicorn'  
+        expect 'unicorn' to_equal 'unicornx'  
 }
 
 it 'should be equal to itself' equals_self
 
 not_equals_pony() {
-        ! expect 'unicorn' not to_equal 'pony'
+        ! expect 'unicorn' to_equal 'pony'
 }
 
 it 'should not be equal to a pony' not_equals_pony

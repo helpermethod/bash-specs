@@ -17,20 +17,25 @@
 
 shopt -s nullglob
 
-LC_NUMERIC='C'
-TIMEFORMAT='%R'
+LC_NUMERIC=C
+TIMEFORMAT=%R
+: ${TMPDIR:=/tmp}
 
-readonly version_number='1.0.0'
+
+readonly version_number=1.0.0
 
 readonly red=$(tput setaf 1)
 readonly green=$(tput setaf 2)
 readonly cyan=$(tput setaf 6)
 readonly default_color=$(tput setaf 9)
 
-number_of_specs='0'
-number_of_specs_failed='0'
+readonly tmp_dir=${TMPDIR}/${RANDOM}.${RANDOM}.$$
+readonly elapsed_time_file=${tmp_dir}/elapsed_time.out
 
-total_elapsed_time='0'
+number_of_specs=0
+number_of_specs_failed=0
+
+total_elapsed_time=0
 
 error_message=''
 
@@ -39,6 +44,7 @@ main() {
 
   printf 'bash-specs %s\n' "$version_number"
 
+  mkdir -m 700 "$tmp_dir"
   trap '__cleanup_exit' EXIT
 
   for suite; do
@@ -143,10 +149,13 @@ it() {
 }
 
 __execute_spec() {
-  local elapsed_time=$({ time "$2" > /dev/null 2>&1; } 2>&1)
+  { time "$2" > /dev/null 2>&1; } 2> "$elapsed_time_file"
   local result=$?
 
   ((number_of_specs++))
+
+  local elapsed_time
+  read elapsed_time < "$elapsed_time_file"
 
   __accumulate_total_elapsed_time "$elapsed_time"
 
