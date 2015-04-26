@@ -22,10 +22,6 @@ TIMEFORMAT='%R'
 
 readonly version_number='1.0.0'
 
-read -d '' version <<- EOF
-	bash-specs $version_number
-EOF
-
 readonly red=$(tput setaf 1)
 readonly green=$(tput setaf 2)
 readonly cyan=$(tput setaf 6)
@@ -39,124 +35,142 @@ total_elapsed_time='0'
 error_message=''
 
 main() {
-	(($# == 0)) && set -- *.suite
+  (($# == 0)) && set -- *.suite
 
-	printf '%s\n' "$version"
+  printf 'bash-specs %s\n' "$version_number"
 
-        trap '__cleanup_exit' EXIT
+  trap '__cleanup_exit' EXIT
 
-	for suite; do
-		. "$suite"
-	done
+  for suite; do
+    . "$suite"
+  done
 
-	__print_summary
+  __print_summary
 }
 
 describe() {
-	printf '\n%s%s\n' "$default_color" "$1"
+  printf '\n%s%s\n' "$default_color" "$1"
 }
 
 before_each() {
-        :
+  :
 }
 
 expect() {
-        $2 $1 ${@:3}
+  $2 $1 ${@:3}
 }
 
 to_equal() {
-        (($1 == $2)) && return 0
+  if is_array $1; then
+    if ((${#1[@]} != ${#2[@]})); then
+      __build_error_message "$1" "$FUNCNAME" "$2"
 
+      return 1
+    fi
+
+    for ((i = 0; i < ${#1[@]}; i++)); do
+      if  [[ ${1[i]} != ${2[i]} ]]; then
         __build_error_message "$1" "$FUNCNAME" "$2"
 
         return 1
+      fi
+    done
+
+    return 0
+  fi
+
+  (($1 == $2)) && return 0
+
+  __build_error_message "$1" "$FUNCNAME" "$2"
+
+  return 1
 }
 
 to_be_less_than() {
-        (($1 < $2)) && return 0
+  (($1 < $2)) && return 0
 
-        __build_error_message "$1" "$FUNCNAME" "$2"
+  __build_error_message "$1" "$FUNCNAME" "$2"
 
-        return 1
+  return 1
 }
 
 to_be_greater_than() {
-	(($1 > $2)) && return 0
+  (($1 > $2)) && return 0
 
-        __build_error_message "$1" "$FUNCNAME" "$2"
+  __build_error_message "$1" "$FUNCNAME" "$2"
 
-	return 1
+  return 1
 }
 
 to_contain() {
-        if is_array $1; then
-                for e in $1; do
-                  [[ $e == $2 ]] && return 0
-                done
+  if is_array $1; then
+    for e in $1; do
+      [[ $e == $2 ]] && return 0
+    done
 
-                __build_error_message "$1" "$FUNCNAME" "$2"
+    __build_error_message "$1" "$FUNCNAME" "$2"
 
-                return 1
-        fi 
+    return 1
+  fi 
 
-        [[ $1 == *$2* ]] && return 0
+  [[ $1 == *$2* ]] && return 0
 
-        __build_error_message "$1" "$FUNCNAME" "$2"
+  __build_error_message "$1" "$FUNCNAME" "$2"
 }
 
 to_match() {
-	if ! [[ $1 =~ $2 ]]; then
-                __build_error_message "$1" "$FUNCNAME" "$2"
+  if ! [[ $1 =~ $2 ]]; then
+    __build_error_message "$1" "$FUNCNAME" "$2"
 
-		return 1
-	fi
+    return 1
+  fi
 }
 
 __build_error_message() {
-        error_message="Expected '$1' ${2//_/ } '$3'."
+  error_message="Expected '$1' ${2//_/ } '$3'."
 }
 
 __is_array() {
-        [[ $(declare -p $1) == "declare -a"* ]]
+  [[ $(declare -p $1) == "declare -a"* ]]
 }
 
 it() {
-	before_each
+  before_each
 
-	__execute_spec "$@"
+  __execute_spec "$@"
 
-	after_each
+  after_each
 }
 
 __execute_spec() {
-        local elapsed_time=$({ time "$2" > /dev/null 2>&1; } 2>&1)
-	local result=$?
+  local elapsed_time=$({ time "$2" > /dev/null 2>&1; } 2>&1)
+  local result=$?
 
-        ((number_of_specs++))
+  ((number_of_specs++))
 
-	__accumulate_total_elapsed_time "$elapsed_time"
+  __accumulate_total_elapsed_time "$elapsed_time"
 
-	if ((result == 0)); then
-		__print_spec_result "$green" "$1" "$elapsed_time"
+  if ((result == 0)); then
+    __print_spec_result "$green" "$1" "$elapsed_time"
 
-		return
-	fi
+    return
+  fi
 
-	((number_of_specs_failed++))
-	__print_spec_result "$red" "$1" "$elapsed_time"
+  ((number_of_specs_failed++))
+  __print_spec_result "$red" "$1" "$elapsed_time"
 
-	if [[ -n $error_message ]]; then
-		printf '    %s\n' "$error_message"
-		error_message=''
-	fi
+  if [[ -n $error_message ]]; then
+    printf '    %s\n' "$error_message"
+    error_message=''
+  fi
 }
 
 __accumulate_total_elapsed_time() {
-	((total_elapsed_time += 10#${1/./}))
+  ((total_elapsed_time += 10#${1/./}))
 }
 
 __print_spec_result() {
-	printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan" "$3"
+  printf '%s  %s%s (%.3f s)\n' "$1" "$2" "$cyan" "$3"
 }
 
 xit() {
@@ -164,22 +178,22 @@ xit() {
 }
 
 after_each() {
-	:
+  :
 }
 
 __cleanup_exit() {
-        tput sgr0
+  tput sgr0
 }
 
 __print_summary() {
-	local units
-	((number_of_specs == 1)) && units='spec' || units='specs'
-	local color
-	((number_of_specs_failed == 0)) && color=$green || color=$red
-	local secs=$((total_elapsed_time / 1000))
-	local millisecs=$((total_elapsed_time % 1000))
+  local units
+  ((number_of_specs == 1)) && units='spec' || units='specs'
+  local color
+  ((number_of_specs_failed == 0)) && color=$green || color=$red
+  local secs=$((total_elapsed_time / 1000))
+  local millisecs=$((total_elapsed_time % 1000))
 
-	printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan" "$secs" "$millisecs" "$default_color"
+  printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan" "$secs" "$millisecs" "$default_color"
 }
 
 main "$@"
