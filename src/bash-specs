@@ -83,8 +83,24 @@ to_be_less_than() {
   (($1 < $2)) && return 0 || return 1
 }
 
+to_be_less_than_or_equal_to() {
+  (($1 <= $2)) && return 0 || return 1
+}
+
 to_be_greater_than() {
   (($1 > $2)) && return 0 || return 1
+}
+
+to_be_greater_than_or_equal_to() {
+  (($1 >= $2)) && return 0 || return 1
+}
+
+to_start_with() {
+  [[ $1 == $2* ]] && return 0 || return 1
+}
+
+to_end_with() {
+  [[ $1 == *$2 ]] && return 0 || return 1
 }
 
 to_contain() {
