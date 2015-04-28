@@ -1,0 +1,10 @@
+describe 'A list of numbers'
+
+equals_self() {
+  local actual=(1 2 3)
+  local expected=(1 2 3)
+
+  expect "${actual[@]}" to_equal "${expected[@]}"
+}
+
+it 'should be equal to itself' equals_self

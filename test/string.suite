@@ -7,7 +7,7 @@ equals_self() {
 it 'should be equal to itself' equals_self
 
 not_equals_pony() {
-        ! expect 'unicorn' to_equal 'pony'
+        expect 'unicorn' to_equal 'pony'
 }
 
 it 'should not be equal to a pony' not_equals_pony
