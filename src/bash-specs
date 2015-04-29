@@ -32,7 +32,8 @@ readonly tmp_dir=${TMPDIR}/${RANDOM}.${RANDOM}.$$
 readonly elapsed_time_file=${tmp_dir}/elapsed_time
 
 number_of_specs=0
-number_of_specs_failed=0
+number_of_failed_specs=0
+number_of_skipped_specs=0
 
 total_elapsed_time=0
 
@@ -113,14 +114,13 @@ to_match() {
 
 __build_error_message() {
   error_message="Expected '$1'"
-  shift 
 
-  if [[ $1 == 'not' ]]; then 
-    error_message="${error_message} $1"
+  if [[ $2 == 'not' ]]; then 
+    error_message="${error_message} $2"
     shift
   fi
 
-  error_message="${error_message} ${1//_/ } '$2'."
+  error_message="${error_message} ${2//_/ } '$3'."
 }
 
 it() {
@@ -148,7 +148,7 @@ __execute_spec() {
     return
   fi
 
-  ((number_of_specs_failed++))
+  ((number_of_failed_specs++))
   __print_spec_result "$red" "$1" "$elapsed_time"
 
   if [[ -n $error_message ]]; then
@@ -166,7 +166,8 @@ __print_spec_result() {
 }
 
 xit() {
-  :
+  ((number_of_specs))
+  ((number_of_skipped_specs++))
 }
 
 after_each() {
@@ -181,11 +182,11 @@ __print_summary() {
   local units
   ((number_of_specs == 1)) && units='spec' || units='specs'
   local color
-  ((number_of_specs_failed == 0)) && color=$green || color=$red
+  ((number_of_failed_specs == 0)) && color=$green || color=$red
   local secs=$((total_elapsed_time / 1000))
   local millisecs=$((total_elapsed_time % 1000))
 
-  printf '\n%s%s %s, %s failed%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_specs_failed" "$cyan" "$secs" "$millisecs" "$reset"
+  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_failed_specs" "$number_of_skipped_specs" "$cyan" "$secs" "$millisecs" "$reset"
 }
 
 main "$@"
