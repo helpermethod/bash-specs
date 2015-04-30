@@ -26,6 +26,7 @@ readonly version_number=1.0.0
 readonly red=$(tput setaf 1)
 readonly green=$(tput setaf 2)
 readonly cyan=$(tput setaf 6)
+readonly yellow=$(tput setaf 3)
 readonly reset=$(tput sgr0)
 
 readonly tmp_dir=${TMPDIR}/${RANDOM}.${RANDOM}.$$
@@ -168,6 +169,8 @@ __print_spec_result() {
 xit() {
   ((number_of_specs))
   ((number_of_skipped_specs++))
+
+  __print_spec_result "$yellow" "$1" '0.000'
 }
 
 after_each() {
