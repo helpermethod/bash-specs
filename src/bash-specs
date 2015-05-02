@@ -51,6 +51,8 @@ main() {
 
   for suite; do
     . "$suite"
+
+    skip=false
   done
 
   __print_summary
