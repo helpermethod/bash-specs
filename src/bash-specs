@@ -31,14 +31,13 @@ readonly reset=$(tput sgr0)
 
 readonly tmp_dir=${TMPDIR}/${RANDOM}.${RANDOM}.$$
 readonly elapsed_time_file=${tmp_dir}/elapsed_time
+readonly stderr_file=${tmp_dir}/stderr
 
 number_of_specs=0
 number_of_failed_specs=0
 number_of_skipped_specs=0
 
 total_elapsed_time=0
-
-error_message=''
 
 main() {
   (($# == 0)) && set -- *.suite
@@ -72,7 +71,7 @@ expect() {
 
   local result=$?
 
-  ((result != 0)) && __build_error_message "$@"
+  ((result != 0)) && __print_error_message "$@"
 
   return "$result"
 }
@@ -113,8 +112,8 @@ to_match() {
   [[ $1 =~ $2 ]] && return 0 || return 1
 }
 
-__build_error_message() {
-  error_message="Expected '$1'"
+__print_error_message() {
+  local error_message="Expected '$1'"
 
   if [[ $2 == 'not' ]]; then 
     error_message="${error_message} $2"
@@ -122,6 +121,8 @@ __build_error_message() {
   fi
 
   error_message="${error_message} ${2//_/ } '$3'."
+
+  printf '%s\n' "$error_message" 1>&2
 }
 
 it() {
@@ -133,7 +134,7 @@ it() {
 }
 
 __execute_spec() {
-  { time "$2" > /dev/null 2>&1; } 2> "$elapsed_time_file"
+  { time "$2" > /dev/null 2> "$stderr_file"; } 2> "$elapsed_time_file"
   local result=$?
 
   ((number_of_specs++))
@@ -152,9 +153,8 @@ __execute_spec() {
   ((number_of_failed_specs++))
   __print_spec_result "$red" "$1" "$elapsed_time"
 
-  if [[ -n $error_message ]]; then
-    printf '    %s\n' "$error_message"
-    error_message=''
+  if [[ -s $stderr_file ]]; then
+    printf '    %s\n' "$(< "$stderr_file")"
   fi
 }
 
