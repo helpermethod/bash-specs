@@ -37,6 +37,8 @@ number_of_specs=0
 number_of_failed_specs=0
 number_of_skipped_specs=0
 
+skip_specs=false
+
 total_elapsed_time=0
 
 main() {
@@ -56,6 +58,8 @@ main() {
 
 describe() {
   printf '\n%s\n' "$1"
+
+  skip=false
 }
 
 before_each() {
@@ -126,6 +130,8 @@ __print_error_message() {
 }
 
 it() {
+  [[ "$skip" == true ]] && xit "$@"
+
   before_each
 
   __execute_spec "$@"
@@ -174,7 +180,9 @@ xit() {
 }
 
 xdescribe() {
-  :
+  printf '\n%s\n' "$1"
+
+  skip=true
 }
 
 after_each() {
