@@ -30,8 +30,8 @@ readonly yellow=$(tput setaf 3)
 readonly reset=$(tput sgr0)
 
 readonly tmp_dir=${TMPDIR}/${RANDOM}.${RANDOM}.$$
-readonly elapsed_time_file=${tmp_dir}/elapsed_time
-readonly stderr_file=${tmp_dir}/stderr
+readonly elapsed_time=${tmp_dir}/elapsed_time
+readonly stderr=${tmp_dir}/stderr
 
 number_of_specs=0
 number_of_failed_specs=0
@@ -45,7 +45,7 @@ main() {
   printf 'bash-specs %s\n' "$version_number"
 
   mkdir -m 700 "$tmp_dir"
-  trap '__cleanup' EXIT
+  trap '__cleanup' TERM EXIT
 
   for suite; do
     . "$suite"
@@ -134,27 +134,27 @@ it() {
 }
 
 __execute_spec() {
-  { time "$2" > /dev/null 2> "$stderr_file"; } 2> "$elapsed_time_file"
+  { time "$2" > /dev/null 2> "$stderr"; } 2> "$elapsed_time"
   local result=$?
 
   ((number_of_specs++))
 
-  local elapsed_time
-  read elapsed_time < "$elapsed_time_file"
+  local elapsed
+  read elapsed < "$elapsed_time"
 
-  __accumulate_total_elapsed_time "$elapsed_time"
+  __accumulate_total_elapsed_time "$elapsed"
 
   if ((result == 0)); then
-    __print_spec_result "$green" "$1" "$elapsed_time"
+    __print_spec_result "$green" "$1" "$elapsed"
 
     return
   fi
 
   ((number_of_failed_specs++))
-  __print_spec_result "$red" "$1" "$elapsed_time"
+  __print_spec_result "$red" "$1" "$elapsed"
 
   if [[ -s $stderr_file ]]; then
-    printf '    %s\n' "$(< "$stderr_file")"
+    printf '    %s\n' "$(< "$stderr")"
   fi
 }
 
@@ -171,6 +171,10 @@ xit() {
   ((number_of_skipped_specs++))
 
   __print_spec_result "$yellow" "$1" '0.000'
+}
+
+xdescribe() {
+  :
 }
 
 after_each() {
