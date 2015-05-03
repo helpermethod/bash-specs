@@ -41,6 +41,8 @@ skip_specs=false
 
 total_elapsed_time=0
 
+declare -A 
+
 main() {
   (($# == 0)) && set -- *.suite
 
@@ -52,7 +54,7 @@ main() {
   for suite; do
     . "$suite"
 
-    skip=false
+    skip_specs=false
   done
 
   __print_summary
@@ -61,7 +63,7 @@ main() {
 describe() {
   printf '\n%s\n' "$1"
 
-  skip=false
+  skip_specs=false
 }
 
 before_each() {
@@ -184,7 +186,7 @@ xit() {
 xdescribe() {
   printf '\n%s\n' "$1"
 
-  skip=true
+  skip_specs=true
 }
 
 after_each() {

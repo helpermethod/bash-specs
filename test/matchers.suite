@@ -1,0 +1,9 @@
+describe 'to_equal'
+
+true_for_equal_values() {
+  'bash' to_equal 'bash'
+
+  expect "$?" to_be_true
+}
+
+it 'should be true for equal values' true_for_equal_values
