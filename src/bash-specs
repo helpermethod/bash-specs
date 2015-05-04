@@ -41,8 +41,6 @@ skip_specs=false
 
 total_elapsed_time=0
 
-declare -A 
-
 main() {
   (($# == 0)) && set -- *.suite
 
@@ -134,7 +132,11 @@ __print_error_message() {
 }
 
 it() {
-  [[ "$skip" == true ]] && xit "$@"
+  if [[ "$skip_specs" == true ]]; then
+    xit "$@"
+
+    return 0
+  fi
 
   before_each
 
@@ -163,7 +165,7 @@ __execute_spec() {
   ((number_of_failed_specs++))
   __print_spec_result "$red" "$1" "$elapsed"
 
-  if [[ -s $stderr_file ]]; then
+  if [[ -s $stderr ]]; then
     printf '    %s\n' "$(< "$stderr")"
   fi
 }

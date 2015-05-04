@@ -1,9 +1,19 @@
 describe 'to_equal'
 
-true_for_equal_values() {
-  'bash' to_equal 'bash'
-
-  expect "$?" to_be_true
+_() {
+  if ! to_equal 'bash' 'bash'; then
+    printf "Expected 'bash' to equal 'bash'" 1>&2
+    return 1
+  fi
 }
 
-it 'should be true for equal values' true_for_equal_values
+it 'should be true for equal values' _
+
+_() {
+  if to_equal 'bash' 'sh'; then
+    printf "Expected 'bash' not to equal 'sh'" 1>&2
+    return 1
+  fi
+}
+
+it 'should be false for distinct values' _
