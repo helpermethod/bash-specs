@@ -212,10 +212,10 @@ __print_summary() {
   ((number_of_specs == 1)) && units=spec || units=specs
   local color
   ((number_of_failed_specs == 0)) && color=$green || color=$red
-  local secs=$((total_elapsed_time / 1000))
-  local millisecs=$((total_elapsed_time % 1000))
+  local seconds=$((total_elapsed_time / 1000))
+  local milli_seconds=$((total_elapsed_time % 1000))
 
-  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_failed_specs" "$number_of_skipped_specs" "$cyan" "$secs" "$millisecs" "$reset"
+  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_failed_specs" "$number_of_skipped_specs" "$cyan" "$seconds" "$milli_seconds" "$reset"
 }
 
 main "$@"
