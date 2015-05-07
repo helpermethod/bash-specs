@@ -42,6 +42,9 @@ skip_specs=false
 total_elapsed_time=0
 
 original_functions=()
+declare -A status_queue
+declare -A number_of_calls
+declare -A calls
 
 main() {
   (($# == 0)) && set -- *.suite
@@ -197,10 +200,28 @@ after_each() {
   :
 }
 
-create_spy() {
-  original_functions+=($(declare -f "$1"))
-  local spy_definition=$(declare -f "$2")
-  eval "${1}()${spy_definition#*\)}"
+__return_status() {
+  :
+}
+
+__mock() {
+  local number=$((${number_of_calls[$FUNCNAME]} + 1))
+  number_of_calls[$FUNCNAME]=$((number))
+
+  for ((i = 0; i < $#; i++)); do
+    calls["$FUNCNAME","$number","$i"]="${!i}"
+  done
+
+  printf 'calls %s' "${calls[@]}"
+
+  __return_status "$FUNCNAME"
+}
+
+create_mock() {
+  original_functions+=("$(declare -f "$1")")
+  local mock_definition=$(declare -f __mock)
+  eval "${1}()${mock_definition#*\)}"
+  number_of_calls["$1"]=0 
 }
 
 __cleanup() {
@@ -212,10 +233,10 @@ __print_summary() {
   ((number_of_specs == 1)) && units=spec || units=specs
   local color
   ((number_of_failed_specs == 0)) && color=$green || color=$red
-  local secs=$((total_elapsed_time / 1000))
-  local millisecs=$((total_elapsed_time % 1000))
+  local seconds=$((total_elapsed_time / 1000))
+  local milli_seconds=$((total_elapsed_time % 1000))
 
-  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_failed_specs" "$number_of_skipped_specs" "$cyan" "$secs" "$millisecs" "$reset"
+  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_failed_specs" "$number_of_skipped_specs" "$cyan" "$seconds" "$milli_seconds" "$reset"
 }
 
 main "$@"
