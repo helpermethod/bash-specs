@@ -59,8 +59,6 @@ main() {
 
   for suite; do
     . "$suite"
-
-    skip_specs=false
   done
 
   __print_summary
@@ -85,7 +83,7 @@ expect() {
 
   local result=$?
 
-  ((result != 0)) && __print_error_message "$@"
+  ((result > 0)) && __print_error_message "$@"
 
   return "$result"
 }
@@ -126,10 +124,14 @@ to_match() {
   [[ $1 =~ $2 ]]
 }
 
+to_be_called_with() {
+  calls[]
+}
+
 __print_error_message() {
   local error_message="Expected '$1'"
 
-  if [[ $2 == not ]]; then 
+  if [[ $2 == not ]]; then
     error_message="${error_message} $2"
     shift
   fi
@@ -151,112 +153,120 @@ it() {
   __execute_spec "$@"
 
   after_each
+
+  ((${#original_functions[@]} > 0)) && __restore_original_functions
 }
 
 __execute_spec() {
   { time "$2" > /dev/null 2> "$stderr"; } 2> "$elapsed_time"
-    local result=$?
+  local result=$?
 
-    ((number_of_specs++))
+  ((number_of_specs++))
 
-    local elapsed
-    read elapsed < "$elapsed_time"
+  local elapsed
+  read elapsed < "$elapsed_time"
 
-    __accumulate_total_elapsed_time "$elapsed"
+  __accumulate_total_elapsed_time "$elapsed"
 
-    if ((result == 0)); then
-      __print_spec_result "$green" "$1" "$elapsed"
+  if ((result == 0)); then
+    __print_spec_result "$green" "$1" "$elapsed"
 
-      return
-    fi
+    return
+  fi
 
-    ((number_of_failed_specs++))
-    __print_spec_result "$red" "$1" "$elapsed"
+  ((number_of_failed_specs++))
+  __print_spec_result "$red" "$1" "$elapsed"
 
-    if [[ -s $stderr ]]; then
-      printf '    %s\n' "$(< "$stderr")"
-    fi
-  }
+  if [[ -s $stderr ]]; then
+    printf '    %s\n' "$(< "$stderr")"
+  fi
+}
 
-  __accumulate_total_elapsed_time() {
-    ((total_elapsed_time += 10#${1/./}))
-  }
+__accumulate_total_elapsed_time() {
+  ((total_elapsed_time += 10#${1/./}))
+}
 
-  __print_spec_result() {
-    printf '%s  %s%s (%.3f s)%s\n' "$1" "$2" "$cyan" "$3" "$reset"
-  }
+__print_spec_result() {
+  printf '%s  %s%s (%.3f s)%s\n' "$1" "$2" "$cyan" "$3" "$reset"
+}
 
-  xit() {
-    ((number_of_specs))
-    ((number_of_skipped_specs++))
+xit() {
+  ((number_of_specs))
+  ((number_of_skipped_specs++))
 
-    __print_spec_result "$yellow" "$1" '0.000'
-  }
+  __print_spec_result "$yellow" "$1" '0.000'
+}
 
-  xdescribe() {
-    printf '\n%s\n' "$1"
+xdescribe() {
+  printf '\n%s\n' "$1"
 
-    skip_specs=true
-  }
+  skip_specs=true
+}
 
-  after_each() {
-    :
-  }
+after_each() {
+  :
+}
 
-  __next_value() {                                      
-    local front=${queue_front[$1]}                    
-    local value=${value_queue[$1,$front]:-${default_values[$1]}} 
+__next_value() {
+  local front=${queue_front[$1]}
+  local value=${value_queue[$1,$front]:-${default_values[$1]}}
 
-    queue_front[$1]=$((queue_front[$1] + 1))            
+  queue_front[$1]=$((queue_front[$1] + 1))
 
-    return "$value"                                     
-  }                                                     
+  return "$value"
+}
 
-  __mock() {                                            
-    local number=$((${number_of_calls[$FUNCNAME]} + 1)) 
-    number_of_calls[$FUNCNAME]=$((number))              
+__mock() {
+  local number=$((${number_of_calls[$FUNCNAME]} + 1))
+  number_of_calls[$FUNCNAME]=$((number))
 
-    for ((i = 1; i <= $#; i++)); do                     
-      function_calls[$FUNCNAME,$number,$i]=${!i}
-    done                                                
+  for ((i = 1; i <= $#; i++)); do
+    function_calls[$FUNCNAME,$number,$i]=${!i}
+  done
 
-    __next_value "$FUNCNAME"                            
-  }                                                     
+  __next_value "$FUNCNAME"
+}
 
-  create_mock() {                                       
-    original_functions+=("$(declare -f "$1")")          
-    local mock_definition=$(declare -f __mock)          
-    eval "${1}()${mock_definition#*\)}"                 
-    number_of_calls[$1]=0                             
-    queue_size[$1]=0                                  
-    queue_front[$1]=0                                 
-    default_values[$1]=0
-  }                                                     
+create_mock() {
+  original_functions+=("$(declare -f "$1")")
+  local mock_definition=$(declare -f __mock)
+  eval "${1}()${mock_definition#*\)}"
+  number_of_calls[$1]=0
+  queue_size[$1]=0
+  queue_front[$1]=0
+  default_values[$1]=0
+}
 
-  mock_return_value_once() {           
-    local size=${queue_size[$1]}
-    value_queue[$1,$size]=$2  
+__restore_original_functions() {
+  for f in "${original_functions[@]}"; do
+    eval "$f"
+  done
+}
 
-    queue_size[$1]=$((size + 1))
-  }                               
+mock_return_value_once() {
+  local size=${queue_size[$1]}
+  value_queue[$1,$size]=$2
 
-  mock_return_value() {
-    default_values[$1]=$2
-  }
+  queue_size[$1]=$((size + 1))
+}
 
-  __cleanup() {
-    rm -rf "$tmp_dir"
-  }
+mock_return_value() {
+  default_values[$1]=$2
+}
 
-  __print_summary() {
-    local units
-    ((number_of_specs == 1)) && units=spec || units=specs
-    local color
-    ((number_of_failed_specs == 0)) && color=$green || color=$red
-    local seconds=$((total_elapsed_time / 1000))
-    local milli_seconds=$((total_elapsed_time % 1000))
+__cleanup() {
+  rm -rf "$tmp_dir"
+}
 
-    printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_failed_specs" "$number_of_skipped_specs" "$cyan" "$seconds" "$milli_seconds" "$reset"
-  }
+__print_summary() {
+  local units
+  ((number_of_specs == 1)) && units=spec || units=specs
+  local color
+  ((number_of_failed_specs == 0)) && color=$green || color=$red
+  local seconds=$((total_elapsed_time / 1000))
+  local milli_seconds=$((total_elapsed_time % 1000))
 
-  main "$@"
+  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_failed_specs" "$number_of_skipped_specs" "$cyan" "$seconds" "$milli_seconds" "$reset"
+}
+
+main "$@"
