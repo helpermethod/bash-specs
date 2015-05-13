@@ -124,8 +124,14 @@ to_match() {
   [[ $1 =~ $2 ]]
 }
 
+# TODO document
 to_be_called_with() {
-  calls[]
+  for ((i = 0; i < ${number_of_calls[$1]}; i++)); do
+    for ((j = 2; j <= $#; j++)); do
+      local arg_idx=$((j + 1))
+      [[ ${function_calls[$1, $i, $j]} == ${!arg_idx} ]] || return 1
+    done
+  done
 }
 
 __print_error_message() {
