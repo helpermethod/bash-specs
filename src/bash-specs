@@ -124,7 +124,6 @@ to_match() {
   [[ $1 =~ $2 ]]
 }
 
-# TODO document
 to_be_called_with() {
   for ((i = 0; i < ${number_of_calls[$1]}; i++)); do
     for ((j = 2; j <= $#; j++)); do
