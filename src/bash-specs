@@ -70,41 +70,8 @@ describe() {
   skip_specs=false
 }
 
-xdescribe() {
-  printf '\n%s\n' "$1"
-
-  skip_specs=true
-}
-
 before_each() {
   :
-}
-
-after_each() {
-  :
-}
-
-it() {
-  if [[ $skip_specs == true ]]; then
-    xit "$@"
-
-    return
-  fi
-
-  before_each
-
-  __execute_spec "$@"
-
-  after_each
-
-  ((${#original_functions[@]} > 0)) && __restore_original_functions
-}
-
-xit() {
-  ((number_of_specs))
-  ((number_of_skipped_specs++))
-
-  __print_spec_result "$yellow" "$1" '0.000'
 }
 
 expect() {
@@ -179,6 +146,22 @@ __print_error_message() {
   printf '%s\n' "$error_message" 1>&2
 }
 
+it() {
+  if [[ $skip_specs == true ]]; then
+    xit "$@"
+
+    return
+  fi
+
+  before_each
+
+  __execute_spec "$@"
+
+  after_each
+
+  ((${#original_functions[@]} > 0)) && __restore_original_functions
+}
+
 __execute_spec() {
   { time "$2" > /dev/null 2> "$stderr"; } 2> "$elapsed_time"
   local result=$?
@@ -210,6 +193,23 @@ __accumulate_total_elapsed_time() {
 
 __print_spec_result() {
   printf '%s  %s%s (%.3f s)%s\n' "$1" "$2" "$cyan" "$3" "$reset"
+}
+
+xit() {
+  ((number_of_specs))
+  ((number_of_skipped_specs++))
+
+  __print_spec_result "$yellow" "$1" '0.000'
+}
+
+xdescribe() {
+  printf '\n%s\n' "$1"
+
+  skip_specs=true
+}
+
+after_each() {
+  :
 }
 
 __next_value() {
