@@ -60,7 +60,7 @@ main() {
   trap '__cleanup' TERM EXIT
 
   for suite; do
-    . "$suite"
+    (. "$suite")
   done
 
   __print_summary
