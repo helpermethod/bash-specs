@@ -57,10 +57,6 @@ describe() {
   skip_specs=false
 }
 
-before_each() {
-  :
-}
-
 expect() {
   if [[ $2 == not ]]; then
     ! "$3" "$1" "${@:4}"
@@ -154,130 +150,140 @@ it() {
 
 __execute_spec() {
   { time "$2" > /dev/null 2> "$stderr"; } 2> "$elapsed_time"
-  local result=$?
+    local result=$?
 
-  ((number_of_specs++))
+    ((number_of_specs++))
 
-  local elapsed
-  read elapsed < "$elapsed_time"
+    local elapsed
+    read elapsed < "$elapsed_time"
 
-  __accumulate_total_elapsed_time "$elapsed"
+    __accumulate_total_elapsed_time "$elapsed"
 
-  if ((result == 0)); then
-    __print_spec_result "$green" "$1" "$elapsed"
+    if ((result == 0)); then
+      __print_spec_result "$green" "$1" "$elapsed"
 
-    return
-  fi
+      return
+    fi
 
-  ((number_of_failed_specs++))
-  __print_spec_result "$red" "$1" "$elapsed"
+    ((number_of_failed_specs++))
+    __print_spec_result "$red" "$1" "$elapsed"
 
-  if [[ -s $stderr ]]; then
-    printf '    %s\n' "$(< "$stderr")"
-  fi
-}
+    if [[ -s $stderr ]]; then
+      printf '    %s\n' "$(< "$stderr")"
+    fi
+  }
 
-__accumulate_total_elapsed_time() {
-  ((total_elapsed_time += 10#${1/./}))
-}
+  __accumulate_total_elapsed_time() {
+    ((total_elapsed_time += 10#${1/./}))
+  }
 
-__print_spec_result() {
-  printf '%s  %s%s (%.3f s)%s\n' "$1" "$2" "$cyan" "$3" "$reset"
-}
+  __print_spec_result() {
+    printf '%s  %s%s (%.3f s)%s\n' "$1" "$2" "$cyan" "$3" "$reset"
+  }
 
-xit() {
-  ((number_of_specs))
-  ((number_of_skipped_specs++))
+  xit() {
+    ((number_of_specs))
+    ((number_of_skipped_specs++))
 
-  __print_spec_result "$yellow" "$1" 0
-}
+    __print_spec_result "$yellow" "$1" 0
+  }
 
-xdescribe() {
-  printf '\n%s\n' "$1"
+  xdescribe() {
+    printf '\n%s\n' "$1"
 
-  skip_specs=true
-}
+    skip_specs=true
+  }
 
-after_each() {
-  :
-}
+  after_each() {
+    :
+  }
 
-__next_value() {
-  local front=${queue_front[$1]}
-  local value=${value_queue[$1,$front]:-${default_values[$1]}}
+  __next_value() {
+    local front=${queue_front[$1]}
+    local value=${value_queue[$1,$front]:-${default_values[$1]}}
 
-  queue_front[$1]=$((queue_front[$1] + 1))
+    queue_front[$1]=$((queue_front[$1] + 1))
 
-  return "$value"
-}
+    return "$value"
+  }
 
-__mock() {
-  local number=${number_of_calls[$FUNCNAME]}
+  __mock() {
+    local number=${number_of_calls[$FUNCNAME]}
 
-  for ((i = 1; i <= $#; i++)); do
-    function_calls[$FUNCNAME,$number,$((i - 1))]=${!i}
-  done
+    for ((i = 1; i <= $#; i++)); do
+      function_calls[$FUNCNAME,$number,$((i - 1))]=${!i}
+    done
 
-  number_of_calls[$FUNCNAME]=$((number + 1))
+    number_of_calls[$FUNCNAME]=$((number + 1))
 
-  __next_value "$FUNCNAME"
-}
+    __next_value "$FUNCNAME"
+  }
 
-create_mock() {
-  original_functions+=("$(declare -f "$1")")
-  local mock_definition=$(declare -f __mock)
-  eval "${1}()${mock_definition#*\)}"
-  number_of_calls[$1]=0
-  queue_size[$1]=0
-  queue_front[$1]=0
-  default_values[$1]=0
-}
+  create_mock() {
+    original_functions+=("$(declare -f "$1")")
+    local mock_definition=$(declare -f __mock)
+    eval "${1}()${mock_definition#*\)}"
+    number_of_calls[$1]=0
+    queue_size[$1]=0
+    queue_front[$1]=0
+    default_values[$1]=0
+  }
 
-__restore_original_functions() {
-  for f in "${original_functions[@]}"; do
-    eval "$f"
-  done
-}
+  __restore_original_functions() {
+    for f in "${original_functions[@]}"; do
+      eval "$f"
+    done
+  }
 
-mock_return_value_once() {
-  local size=${queue_size[$1]}
-  value_queue[$1,$size]=$2
+  mock_return_value_once() {
+    local size=${queue_size[$1]}
+    value_queue[$1,$size]=$2
 
-  queue_size[$1]=$((size + 1))
-}
+    queue_size[$1]=$((size + 1))
+  }
 
-mock_return_value() {
-  default_values[$1]=$2
-}
+  mock_return_value() {
+    default_values[$1]=$2
+  }
 
-__cleanup() {
-  rm -rf "$tmp_dir"
-}
+  __cleanup() {
+    rm -rf "$tmp_dir"
+  }
 
-__print_summary() {
-  local units
-  ((number_of_specs == 1)) && units=spec || units=specs
-  local color
-  ((number_of_failed_specs == 0)) && color=$green || color=$red
-  local seconds=$((total_elapsed_time / 1000))
-  local milli_seconds=$((total_elapsed_time % 1000))
+  __print_summary() {
+    local units
+    ((number_of_specs == 1)) && units=spec || units=specs
+    local color
+    ((number_of_failed_specs == 0)) && color=$green || color=$red
+    local seconds=$((total_elapsed_time / 1000))
+    local milli_seconds=$((total_elapsed_time % 1000))
 
-  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_failed_specs" "$number_of_skipped_specs" "$cyan" "$seconds" "$milli_seconds" "$reset"
-}
+    printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_failed_specs" "$number_of_skipped_specs" "$cyan" "$seconds" "$milli_seconds" "$reset"
+  }
 
-main() {
-  (($# == 0)) && set -- *.suite
+  main() {
+    (($# == 0)) && set -- *.suite
 
-  printf 'bash-specs %s\n' "$version_number"
+    printf 'bash-specs %s\n' "$version_number"
 
-  mkdir -m 700 "$tmp_dir"
-  trap '__cleanup' TERM EXIT
+    mkdir -m 700 "$tmp_dir"
+    trap '__cleanup' TERM EXIT
 
-  for suite; do
-    (. "$suite")
-  done
+    for suite; do
+      (
+        before_each() {
+          :
+        }
 
-  __print_summary
-}
+        after_each() {
+          :
+        }
 
-main "$@"
+        . "$suite"
+      )
+    done
+
+    __print_summary
+  }
+
+  main "$@"
