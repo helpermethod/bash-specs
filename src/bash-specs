@@ -262,7 +262,7 @@ __print_summary() {
 }
 
 main() {
-  (($# == 0)) && set -- *.suite
+  (($# == 0)) && set -- *.spec
 
   printf 'bash-specs %s\n' "$version_number"
 
