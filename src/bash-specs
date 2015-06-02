@@ -280,10 +280,10 @@ main() {
       }
 
       . "$suite"
+
+      __print_summary
     )
   done
-
-  __print_summary
 }
 
 main "$@"

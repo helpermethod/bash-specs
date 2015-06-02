@@ -1,5 +1,3 @@
-# vim: set syn=sh
-
 describe 'to_equal'
 
 _() {
