@@ -1,0 +1,2 @@
+language: bash
+script: ./src/bash-specs/bash-specs test/matchers/*.spec
