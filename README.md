@@ -1,3 +1,5 @@
+https://travis-ci.org/helpermethod/bash-specs.svg?branch=master
+
 # bash-specs
 
 
