@@ -7,7 +7,7 @@ _() {
   fi
 }
 
-it 'should be true for equal values' _
+it 'passes when actual == expected' _
 
 _() {
   if to_equal 'bash' 'sh'; then
@@ -16,4 +16,4 @@ _() {
   fi
 }
 
-it 'should be false for unequal values' _
+it 'passes when actual != expected' _
