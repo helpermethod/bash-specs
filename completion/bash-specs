@@ -1,1 +1,1 @@
-complete -G *.suite bash-specs
+complete -G *-spec.sh bash-specs

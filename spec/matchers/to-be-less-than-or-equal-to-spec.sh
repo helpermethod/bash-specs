@@ -7,8 +7,7 @@ _() {
   expect "$?" to_equal 0
 }
 
-
-it 'passes when actual <= expected'
+it 'passes when actual <= expected' _
 
 _() {
   to_be_less_than_or_equal_to 1 2
