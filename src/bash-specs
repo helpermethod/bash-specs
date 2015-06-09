@@ -262,14 +262,20 @@ __print_summary() {
 }
 
 main() {
-  (($# == 0)) && set -- *.spec
+  local specs=($@)
+
+  if ((${#specs[@]} == 0)); then
+    while read -d $'\0' -r; do
+      specs+=($REPLY)
+    done < <(find test -name '*-spec.sh' -print0)
+  fi
 
   printf 'bash-specs %s\n' "$version_number"
 
   mkdir -m 700 "$tmp_dir"
   trap '__cleanup' TERM EXIT
 
-  for suite; do
+  for spec in ${specs[@]}; do
     (
       before_each() {
         :
@@ -279,11 +285,12 @@ main() {
         :
       }
 
-      . "$suite"
+      . "$spec"
 
-      __print_summary
     )
   done
+
+  __print_summary
 }
 
 main "$@"
