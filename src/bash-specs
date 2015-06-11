@@ -251,7 +251,7 @@ mock_return_value() {
 }
 
 __cleanup_int() {
-
+  # TODO kill itself
   __cleanup
 }
 
@@ -275,6 +275,7 @@ __print_summary() {
 }
 
 main() {
+  # TODO parse args call __run_specs
   local specs=($@)
 
   if ((${#specs[@]} == 0)); then
