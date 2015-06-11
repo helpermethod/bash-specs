@@ -31,15 +31,14 @@ readonly reset=$(tput sgr0)
 
 readonly tmp_dir=${TMPDIR}/${RANDOM}.${RANDOM}.$$
 readonly elapsed_time=${tmp_dir}/elapsed_time
+readonly total_elapsed_time=${tmp_dir}/total_elapsed_time
 readonly stderr=${tmp_dir}/stderr
 
-number_of_specs=0
-number_of_failed_specs=0
-number_of_skipped_specs=0
+readonly number_of_specs=${tmp_dir}/number_of_specs
+readonly number_of_failed_specs=${tmp_dir}/number_of_failed_specs
+readonly number_of_skipped_specs=${tmp_dir}/number_of_skipped_specs
 
 skip_specs=false
-
-total_elapsed_time=0
 
 original_functions=()
 
@@ -152,10 +151,9 @@ __execute_spec() {
   { time "$2" > /dev/null 2> "$stderr"; } 2> "$elapsed_time"
   local result=$?
 
-  ((number_of_specs++))
+  __inc "$number_of_specs"
 
-  local elapsed
-  read elapsed < "$elapsed_time"
+  local elapsed=$(< "$elapsed_time")
 
   __accumulate_total_elapsed_time "$elapsed"
 
@@ -165,16 +163,21 @@ __execute_spec() {
     return
   fi
 
-  ((number_of_failed_specs++))
+  __inc "$number_of_failed_specs"
+
   __print_spec_result "$red" "$1" "$elapsed"
 
-  if [[ -s $stderr ]]; then
+  if [[ -s "$stderr" ]]; then
     printf '    %s\n' "$(< "$stderr")"
   fi
 }
 
+__inc() {
+  printf '%d' $(($(< "$1") + 1)) > "$1"
+}
+
 __accumulate_total_elapsed_time() {
-  ((total_elapsed_time += 10#${1/./}))
+  printf '%d' $(($(< "$total_elapsed_time") + 10#${1/./})) > "$total_elapsed_time"
 }
 
 __print_spec_result() {
@@ -182,8 +185,8 @@ __print_spec_result() {
 }
 
 xit() {
-  ((number_of_specs))
-  ((number_of_skipped_specs++))
+  __inc "$number_of_specs"
+  __inc "$number_of_skipped_specs"
 
   __print_spec_result "$yellow" "$1" 0
 }
@@ -223,6 +226,7 @@ create_mock() {
   original_functions+=("$(declare -f "$1")")
   local mock_definition=$(declare -f __mock)
   eval "${1}()${mock_definition#*\)}"
+
   number_of_calls[$1]=0
   queue_size[$1]=0
   queue_front[$1]=0
@@ -246,19 +250,28 @@ mock_return_value() {
   default_values[$1]=$2
 }
 
+__cleanup_int() {
+
+  __cleanup
+}
+
 __cleanup() {
   rm -rf "$tmp_dir"
 }
-
+ 
 __print_summary() {
+  local total=$(< "$number_of_specs")
+  local failed=$(< "$number_of_failed_specs")
+  local skipped=$(< "$number_of_skipped_specs")
   local units
-  ((number_of_specs == 1)) && units=spec || units=specs
+  ((total == 1)) && units=spec || units=specs
   local color
-  ((number_of_failed_specs == 0)) && color=$green || color=$red
-  local seconds=$((total_elapsed_time / 1000))
-  local milli_seconds=$((total_elapsed_time % 1000))
+  ((failed == 0)) && color=$green || color=$red
+  local total_time=$(< "$total_elapsed_time") 
+  local seconds=$((total_time / 1000))
+  local milli_seconds=$((total_time % 1000))
 
-  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$number_of_specs" "$units" "$number_of_failed_specs" "$number_of_skipped_specs" "$cyan" "$seconds" "$milli_seconds" "$reset"
+  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$total" "$units" "$failed" "$skipped" "$cyan" "$seconds" "$milli_seconds" "$reset"
 }
 
 main() {
@@ -274,7 +287,10 @@ main() {
 
   mkdir -m 700 "$tmp_dir"
   trap '__cleanup' TERM EXIT
+  trap '__cleanup_int' INT
 
+  printf 0 | tee "$number_of_specs" "$number_of_failed_specs" "$number_of_skipped_specs" "$total_elapsed_time" > /dev/null
+  
   for spec in ${specs[@]}; do
     (
       before_each() {
