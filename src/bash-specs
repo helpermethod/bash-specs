@@ -309,7 +309,7 @@ main() {
 
   __print_summary
 
-  (($(< "$number_of_specs_failed") > 0)) && exit 1
+  (($(< "$number_of_failed_specs") > 0)) && exit 1
 }
 
 main "$@"
