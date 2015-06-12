@@ -251,7 +251,9 @@ mock_return_value() {
 }
 
 __cleanup_int() {
-  # TODO kill itself
+  trap - INT
+  kill -INT "$$"
+
   __cleanup
 }
 
@@ -275,7 +277,6 @@ __print_summary() {
 }
 
 main() {
-  # TODO parse args call __run_specs
   local specs=($@)
 
   if ((${#specs[@]} == 0)); then
@@ -291,7 +292,7 @@ main() {
   trap '__cleanup_int' INT
 
   printf 0 | tee "$number_of_specs" "$number_of_failed_specs" "$number_of_skipped_specs" "$total_elapsed_time" > /dev/null
-  
+ 
   for spec in ${specs[@]}; do
     (
       before_each() {
@@ -303,11 +304,12 @@ main() {
       }
 
       . "$spec"
-
     )
   done
 
   __print_summary
+
+  (($(< "$number_of_specs_failed") > 0)) && exit 1
 }
 
 main "$@"
