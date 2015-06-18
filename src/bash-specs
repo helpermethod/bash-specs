@@ -195,10 +195,6 @@ xdescribe() {
   skip_specs=true
 }
 
-after_each() {
-  :
-}
-
 __next_value() {
   local front=${queue_front[$1]}
   local value=${value_queue[$1,$front]:-${default_values[$1]}}
