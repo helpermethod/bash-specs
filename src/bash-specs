@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-shopt -s nullglob
-
 LC_NUMERIC=C
 TIMEFORMAT=%R
 : ${TMPDIR:=/tmp}
@@ -49,7 +47,6 @@ declare -A value_queue
 declare -A number_of_calls
 declare -A function_calls
 declare -A default_values
-
 
 describe() {
   printf '\n%s\n' "$1"
@@ -283,14 +280,14 @@ main() {
   if ((${#specs[@]} == 0)); then
     while read -d $'\0' -r; do
       specs+=($REPLY)
-    done < <(find test -name '*-spec.sh' -print0)
+    done < <(find spec -name '*-spec.sh' -print0)
   fi
 
   printf 'bash-specs %s\n' "$version_number"
 
   mkdir -m 700 "$tmp_dir"
-  trap '__cleanup' TERM EXIT
-  trap '__cleanup_int' INT
+  trap __cleanup TERM EXIT
+  trap __cleanup_int INT
 
   for f in "$number_of_specs" "$number_of_failed_specs" "$number_of_skipped_specs" "$total_elapsed_time"; do
     printf 0 > "$f"
@@ -315,4 +312,4 @@ main() {
   (($(< "$number_of_failed_specs") > 0)) && exit 1
 }
 
-main "$@"
+[[ $0 == "$BASH_SOURCE" ]] && main "$@"
