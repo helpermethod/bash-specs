@@ -1,5 +1,4 @@
-cd "${BASH_SOURCE%/*}"
-. ../bash-specs
+cd "${BASH_SOURCE%/*}" && . ../bash-specs
 
 describe 'to_equal'
 

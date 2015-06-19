@@ -1,4 +1,4 @@
-source ../bash-spec
+cd "${BASH_SOURCE%/*}" && . ../bash-specs
 
 describe 'to_be_less_than'
 
