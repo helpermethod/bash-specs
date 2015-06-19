@@ -1,2 +1,2 @@
 language: bash
-script: ./src/bash-specs test/matchers/*.spec
+script: ./run-specs.sh
