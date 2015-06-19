@@ -1,7 +1,10 @@
+cd "${BASH_SOURCE%/*}"
+. ../bash-specs
+
 describe 'to_equal'
 
 _() {
-  if ! to_equal 'bash' 'bash'; then
+  if ! t_to_equal 'bash' 'bash'; then
     printf "Expected 'bash' to equal 'bash'" 1>&2
     return 1
   fi
@@ -10,7 +13,7 @@ _() {
 it 'passes when actual == expected' _
 
 _() {
-  if to_equal 'bash' 'sh'; then
+  if t_to_equal 'bash' 'sh'; then
     printf "Expected 'bash' not to equal 'sh'" 1>&2
     return 1
   fi
