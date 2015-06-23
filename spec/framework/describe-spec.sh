@@ -4,11 +4,18 @@ describe 'describe'
 
 _() {
   t_skip_specs=true
-  t_describe 'bash' > "$tmp_dir/describe"
+  local stdout=$(t_describe 'bash')
 
-  expect $? to_equal 0
-  expect "$(< "$tmp_dir/describe")" to_equal $'\nbash'
+  expect "$stdout" to_equal $'\nbash'
+}
+
+it 'prints the name of the spec suite' _
+
+_() {
+  t_skip_specs=true
+  t_describe 'bash'
+
   expect "$t_skip_specs" to_equal false
 }
 
-it '' _
+it 'sets the global skip_specs flag to false' _
