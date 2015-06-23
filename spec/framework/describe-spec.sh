@@ -3,7 +3,6 @@ cd "${BASH_SOURCE%/*}" && . ../bash-specs
 describe 'describe'
 
 _() {
-  t_skip_specs=true
   local stdout=$(t_describe 'bash')
 
   expect "$stdout" to_equal $'\nbash'
