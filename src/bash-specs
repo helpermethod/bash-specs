@@ -305,7 +305,7 @@ main() {
 
   __print_summary
 
-  (($(< "$number_of_failed_specs") > 0)) && exit 1
+  (($(< "$number_of_failed_specs") == 0)) || exit 1
 }
 
 [[ $0 == "$BASH_SOURCE" ]] && main "$@"
