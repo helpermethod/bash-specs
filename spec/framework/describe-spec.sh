@@ -18,4 +18,4 @@ _() {
   expect "$t_skip_specs" to_equal false
 }
 
-it 'sets the global skip_specs flag to false' _
+it 'sets the skip_specs flag to false' _
