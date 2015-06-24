@@ -101,7 +101,7 @@ to_contain() {
 }
 
 to_match() {
-  [[ $1 =~ "$2" ]]
+  [[ $1 =~ $2 ]]
 }
 
 to_be_called_with() {
@@ -244,7 +244,7 @@ mock_return_value() {
 
 __cleanup_int() {
   trap - INT
-  kill -INT "$$"
+  kill -INT $$
 
   __cleanup
 }
