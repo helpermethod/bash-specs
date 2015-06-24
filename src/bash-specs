@@ -141,8 +141,6 @@ it() {
   __execute_spec "$@"
 
   after_each
-
-  ((${#original_functions[@]} > 0)) && __restore_original_functions
 }
 
 __execute_spec() {
