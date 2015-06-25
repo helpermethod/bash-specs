@@ -274,7 +274,7 @@ main() {
   if ((${#specs[@]} == 0)); then
     while read -d $'\0' -r; do
       specs+=($REPLY)
-    done < <(find spec -name '*-spec.sh' -print0)
+    done < <(find spec -name '*_spec.sh' -print0)
   fi
 
   printf 'bash-specs %s\n' "$version_number"

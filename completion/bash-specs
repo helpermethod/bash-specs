@@ -1,1 +1,1 @@
-complete -G *-spec.sh bash-specs
+complete -G *_spec.sh bash-specs
