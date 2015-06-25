@@ -3,7 +3,7 @@ cd "${BASH_SOURCE%/*}" && . ../bash-specs
 describe 'describe'
 
 _() {
-  expect "$(t_describe 'bash')" to_equal $'\nbash'
+ expect "$(t_describe 'bash')" to_equal $'\nbash'
 }
 
 it 'prints the name of the spec suite' _
