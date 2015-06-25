@@ -1,4 +1,4 @@
-describe 'inc'
+describe '__inc'
 
 _() {
   local inc="$tmp_dir/inc"
