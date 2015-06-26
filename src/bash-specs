@@ -21,11 +21,13 @@ TIMEFORMAT=%R
 
 readonly version_number=1.0.0
 
-readonly red=$(tput setaf 1)
-readonly green=$(tput setaf 2)
-readonly cyan=$(tput setaf 6)
-readonly yellow=$(tput setaf 3)
-readonly reset=$(tput sgr0)
+if [[ -t 1 ]]; then
+  readonly red=$(tput setaf 1)
+  readonly green=$(tput setaf 2)
+  readonly cyan=$(tput setaf 6)
+  readonly yellow=$(tput setaf 3)
+  readonly reset=$(tput sgr0)
+fi
 
 readonly tmp_dir=${TMPDIR}/${RANDOM}.${RANDOM}.$$
 readonly elapsed_time=${tmp_dir}/elapsed_time
