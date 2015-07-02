@@ -107,9 +107,11 @@ to_match() {
 }
 
 to_be_called_with() {
+  echo "args $@" > args.txt
+  echo "#call ${number_of_calls[$1]}" > calls.txt
   for ((i = 0; i < ${number_of_calls[$1]}; i++)); do
     for ((j = 2; j <= $#; j++)); do
-      [[ ${function_calls[$1, $i, $((j - 2))]} == ${!j} ]] || continue 2
+      [[ ${function_calls[$1,$i,$((j - 2))]} == ${!j} ]] || continue 2
     done
 
     return 0
@@ -119,14 +121,30 @@ to_be_called_with() {
 }
 
 __print_error_message() {
+  if [[ $error_message ]]; then
+    printf '%s\n' "$error_message" 1>&2
+    error_message=''
+
+    return
+  fi
+
   local error_message="Expected '$1'"
 
   if [[ $2 == not ]]; then
-    error_message="${error_message} $2"
+    error_message="$error_message $2"
     shift
   fi
 
-  error_message="${error_message} ${2//_/ } '$3'."
+  error_message="$error_message ${2//_/ }"
+
+  local rest=(${@:3})
+
+  for ((i = 0; i < ${#rest}; i++)); do
+    error_message="$error_message '${rest[i]}'"
+    ((i < ${#rest} - 1)) && error_message="${error_message},"
+  done
+
+  error_message+=('.')
 
   printf '%s\n' "$error_message" 1>&2
 }

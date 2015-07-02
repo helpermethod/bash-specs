@@ -2,13 +2,15 @@ cd "${BASH_SOURCE%/*}" && . ../bash-specs
 
 describe 'xit'
 
-f() {
-  :
+before() {
+  create_mock __t_inc
+  create_mock __t_print_spec_result
 }
 
 _() {
-  create_mock __t_inc
-  create_mock __t_print_spec_result
+  f() {
+    :
+  }
 
   t_xit 'disabled' f
 
