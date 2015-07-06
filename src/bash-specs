@@ -107,8 +107,6 @@ to_match() {
 }
 
 to_be_called_with() {
-  echo "args $@" > args.txt
-  echo "#call ${number_of_calls[$1]}" > calls.txt
   for ((i = 0; i < ${number_of_calls[$1]}; i++)); do
     for ((j = 2; j <= $#; j++)); do
       [[ ${function_calls[$1,$i,$((j - 2))]} == ${!j} ]] || continue 2
@@ -128,7 +126,9 @@ __print_error_message() {
     return
   fi
 
-  local error_message="Expected '$1'"
+  local sanitized
+  [[ $1 =~ ^[[:cntrl:]] ]] && sanitized=$(printf '%s' "$1" | sed -n l) || sanitized=$1
+  local error_message="Expected '$sanitized'"
 
   if [[ $2 == not ]]; then
     error_message="$error_message $2"
@@ -140,13 +140,14 @@ __print_error_message() {
   local rest=(${@:3})
 
   for ((i = 0; i < ${#rest}; i++)); do
-    error_message="$error_message '${rest[i]}'"
+    [[ ${rest[i]} =~ ^[[:cntrl:]] ]] && sanitized=$(printf '%s' "${rest[i]}" | sed -n l) || sanitized=${rest[i]}
+    error_message="$error_message '$sanitized'"
     ((i < ${#rest} - 1)) && error_message="${error_message},"
   done
 
   error_message+=('.')
 
-  printf '%s\n' "$error_message" 1>&2
+  printf '%s\n' "${error_message}" 1>&2
 }
 
 it() {
@@ -226,6 +227,7 @@ __mock() {
   local number=${number_of_calls[$FUNCNAME]}
 
   for ((i = 1; i <= $#; i++)); do
+    printf "[$FUNCNAME,$number,$((i - 1))]=${!i}"> __mock
     function_calls[$FUNCNAME,$number,$((i - 1))]=${!i}
   done
 
