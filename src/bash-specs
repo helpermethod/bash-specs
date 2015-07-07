@@ -126,9 +126,7 @@ __print_error_message() {
     return
   fi
 
-  local sanitized
-  [[ $1 =~ ^[[:cntrl:]] ]] && sanitized=$(printf '%s' "$1" | sed -n l) || sanitized=$1
-  local error_message="Expected '$sanitized'"
+ local error_message="Expected '$1'"
 
   if [[ $2 == not ]]; then
     error_message="$error_message $2"
@@ -140,14 +138,13 @@ __print_error_message() {
   local rest=(${@:3})
 
   for ((i = 0; i < ${#rest}; i++)); do
-    [[ ${rest[i]} =~ ^[[:cntrl:]] ]] && sanitized=$(printf '%s' "${rest[i]}" | sed -n l) || sanitized=${rest[i]}
-    error_message="$error_message '$sanitized'"
+   error_message="$error_message '${rest[i]}'"
     ((i < ${#rest} - 1)) && error_message="${error_message},"
   done
 
   error_message+=('.')
 
-  printf '%s\n' "${error_message}" 1>&2
+  printf '%s\n' "${error_message//$'\e'/^[}" 1>&2
 }
 
 it() {
