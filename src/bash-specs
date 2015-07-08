@@ -126,7 +126,7 @@ __print_error_message() {
     return
   fi
 
- local error_message="Expected '$1'"
+  local error_message="Expected '$1'"
 
   if [[ $2 == not ]]; then
     error_message="$error_message $2"
