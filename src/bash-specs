@@ -38,6 +38,7 @@ readonly number_of_specs=${tmp_dir}/number_of_specs
 readonly number_of_failed_specs=${tmp_dir}/number_of_failed_specs
 readonly number_of_skipped_specs=${tmp_dir}/number_of_skipped_specs
 
+error_message=''
 skip_specs=false
 
 original_functions=()
