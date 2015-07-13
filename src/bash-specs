@@ -38,7 +38,7 @@ readonly number_of_specs=${tmp_dir}/number_of_specs
 readonly number_of_failed_specs=${tmp_dir}/number_of_failed_specs
 readonly number_of_skipped_specs=${tmp_dir}/number_of_skipped_specs
 
-error_message=''
+error_message=
 skip_specs=false
 
 original_functions=()
@@ -50,6 +50,36 @@ declare -A value_queue
 declare -A number_of_calls
 declare -A function_calls
 declare -A default_values
+
+run() {
+  printf 'bash-specs %s\n' "$version_number"
+
+  mkdir -m 700 "$tmp_dir"
+  trap __cleanup TERM EXIT
+  trap __cleanup_int INT
+
+  for f in "$number_of_specs" "$number_of_failed_specs" "$number_of_skipped_specs" "$total_elapsed_time"; do
+    printf 0 > "$f"
+  done
+ 
+  for spec in ${specs[@]}; do
+    (
+      before_each() {
+        :
+      }
+
+      after_each() {
+        :
+      }
+
+      . "$spec"
+    )
+  done
+
+  __print_summary
+
+  (($(< "$number_of_failed_specs") == 0)) || exit 1
+}
 
 describe() {
   printf '\n%s\n' "$1"
@@ -289,41 +319,42 @@ __print_summary() {
 }
 
 main() {
+  local pattern
+
+  while :; do
+    case "$1" in
+      --pattern)
+        pattern=$2
+        shift
+        ;;
+      --pattern=*)
+        pattern=${1#*=}
+        ;;
+      --help)
+        ;;
+      --version)
+        ;;
+      --)
+        break
+        ;;
+      -*)
+        printf "%s: unrecognized option -- '%s'\n" "$0" "$1" 1>&2
+        exit 1
+        ;;
+      *)
+        break
+    esac
+  done
+
   local specs=($@)
 
   if ((${#specs[@]} == 0)); then
     while read -d $'\0' -r; do
       specs+=($REPLY)
-    done < <(find spec -name '*_spec.sh' -print0)
+    done < <(find spec -name "${pattern:=*_spec.sh}" -print0)
   fi
 
-  printf 'bash-specs %s\n' "$version_number"
-
-  mkdir -m 700 "$tmp_dir"
-  trap __cleanup TERM EXIT
-  trap __cleanup_int INT
-
-  for f in "$number_of_specs" "$number_of_failed_specs" "$number_of_skipped_specs" "$total_elapsed_time"; do
-    printf 0 > "$f"
-  done
- 
-  for spec in ${specs[@]}; do
-    (
-      before_each() {
-        :
-      }
-
-      after_each() {
-        :
-      }
-
-      . "$spec"
-    )
-  done
-
-  __print_summary
-
-  (($(< "$number_of_failed_specs") == 0)) || exit 1
+  run "$@"
 }
 
 [[ $0 == "$BASH_SOURCE" ]] && main "$@"
