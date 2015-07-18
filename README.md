@@ -5,10 +5,11 @@ bash-specs is a BDD testing framework for Bash shell scripts.
 
 ## Features
 
+* 
 * a DSL resembling human-written specifications 
 
 ## Installation
 
-## Constribute
+## Contribute
 
 ## Support
