@@ -5,9 +5,9 @@ bash-specs is a BDD testing framework for Bash shell scripts.
 
 ## Features
 
-* works with Bash 3.x (function mocks require Bash 4.x)
+* test suite isolation 
 * easy integration with Travis CI
-* mock functions for testing single functions in isolation
+* mock functions
 * extensive reporting including total and per-test execution time
 * a DSL resembling human-written specifications 
 
