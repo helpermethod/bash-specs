@@ -21,14 +21,6 @@ TIMEFORMAT=%R
 
 readonly version_number=1.0.0
 
-if [[ -t 1 ]]; then
-  readonly red=$(tput setaf 1)
-  readonly green=$(tput setaf 2)
-  readonly cyan=$(tput setaf 6)
-  readonly yellow=$(tput setaf 3)
-  readonly reset=$(tput sgr0)
-fi
-
 readonly tmp_dir=${TMPDIR}/${RANDOM}.${RANDOM}.$$
 readonly elapsed_time=${tmp_dir}/elapsed_time
 readonly total_elapsed_time=${tmp_dir}/total_elapsed_time
@@ -325,6 +317,7 @@ __print_summary() {
 main() {
   local directory
   local fail_fast=false
+  local colorize=true
   local pattern
 
   while :; do
@@ -339,6 +332,10 @@ main() {
         ;;
       --fail-fast)
         fail_fast=true
+        shift
+        ;;
+      --no-color)
+        colorize=false
         shift
         ;;
       --pattern)
@@ -364,6 +361,14 @@ main() {
         break
     esac
   done
+
+  if [[ -t 1 ]] && [[ $colorize == true ]]; then
+    readonly red=$(tput setaf 1)
+    readonly green=$(tput setaf 2)
+    readonly cyan=$(tput setaf 6)
+    readonly yellow=$(tput setaf 3)
+    readonly reset=$(tput sgr0)
+  fi
 
   local specs=($@)
 
