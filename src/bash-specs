@@ -52,6 +52,8 @@ declare -A function_calls
 declare -A default_values
 
 run() {
+  local specs=($@)
+
   printf 'bash-specs %s\n' "$version_number"
 
   mkdir -m 700 "$tmp_dir"
@@ -73,7 +75,7 @@ run() {
       }
 
       . "$spec"
-    )
+    ) || break 
   done
 
   __print_summary
@@ -215,6 +217,8 @@ __execute_spec() {
   if [[ -s "$stderr" ]]; then
     printf '    %s\n' "$(< "$stderr")"
   fi
+
+  [[ $fail_fast == true ]] && exit 1
 }
 
 __inc() {
@@ -319,16 +323,31 @@ __print_summary() {
 }
 
 main() {
+  local directory
+  local fail_fast=false
   local pattern
 
   while :; do
     case "$1" in
+      -d | --directory)
+	directory=$2
+        shift 2
+        ;;
+      --directory=*)
+	directory=${1#*=}
+        shift
+        ;;
+      --fail-fast)
+        fail_fast=true
+        shift
+        ;;
       --pattern)
         pattern=$2
-        shift
+        shift 2
         ;;
       --pattern=*)
         pattern=${1#*=}
+        shift
         ;;
       --help)
         ;;
@@ -351,10 +370,10 @@ main() {
   if ((${#specs[@]} == 0)); then
     while read -d $'\0' -r; do
       specs+=($REPLY)
-    done < <(find spec -name "${pattern:=*_spec.sh}" -print0)
+    done < <(find "${directory:-spec}" -name "${pattern:-*_spec.sh}" -print0)
   fi
 
-  run "$@"
+  run "${specs[@]}"
 }
 
 [[ $0 == "$BASH_SOURCE" ]] && main "$@"
