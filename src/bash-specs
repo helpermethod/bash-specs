@@ -131,9 +131,14 @@ to_match() {
   [[ $1 =~ $2 ]]
 }
 
+# f 0 1
+# to_be_called_with 0 
+# to_be_called_with 0 1 => beide undefined
+# to_be_called_with 0 1 2
 to_be_called_with() {
   for ((i = 0; i < ${number_of_calls[$1]}; i++)); do
-    for ((j = 2; j <= $#; j++)); do
+    for ((j = 2; ; j++)); do
+      # TODO test both undefined
       [[ ${function_calls[$1,$i,$((j - 2))]} == ${!j} ]] || continue 2
     done
 
