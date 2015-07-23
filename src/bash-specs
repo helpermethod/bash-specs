@@ -138,7 +138,7 @@ to_match() {
 to_be_called_with() {
   for ((i = 0; i < ${number_of_calls[$1]}; i++)); do
     for ((j = 2; ; j++)); do
-      # TODO test both undefined
+      [[ -z ${function_calls[$1,$i,$((j - 2))]+_} ]] && [[ -z ${!j+_} ]] && break
       [[ ${function_calls[$1,$i,$((j - 2))]} == ${!j} ]] || continue 2
     done
 
