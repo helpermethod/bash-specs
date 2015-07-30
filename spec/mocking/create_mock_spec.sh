@@ -17,7 +17,7 @@ _() {
   expect "${f_definition#*\)}" to_equal "${mock_definition#*\)}"
 }
 
-it '' _
+it 'replaces actual by a mock' _
 
 _() {
   expect ${t_number_of_calls[f]} to_equal 0
@@ -26,4 +26,4 @@ _() {
   expect ${t_default_values[f]} to_equal 0
 }
 
-it '' _
+it 'configured the mock' _
