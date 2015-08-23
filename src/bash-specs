@@ -34,6 +34,7 @@ error_message=
 skip_specs=false
 
 original_functions=()
+mocked_commands=()
 
 declare -A queue_size
 declare -A queue_front
@@ -131,10 +132,6 @@ to_match() {
   [[ $1 =~ $2 ]]
 }
 
-# f 0 1
-# to_be_called_with 0 
-# to_be_called_with 0 1 => beide undefined
-# to_be_called_with 0 1 2
 to_be_called_with() {
   for ((i = 0; i < ${number_of_calls[$1]}; i++)); do
     for ((j = 2; ; j++)); do
@@ -266,7 +263,8 @@ __mock() {
 }
 
 create_mock() {
-  original_functions+=("$(declare -f "$1")")
+  local function_definition=$(declare -f "$1")
+  (($? == 0)) && original_functions+=("$function_definition") || mocked_commands+=("$1")
   local mock_definition=$(declare -f __mock)
   eval "${1}()${mock_definition#*\)}"
 
@@ -279,6 +277,12 @@ create_mock() {
 __restore_original_functions() {
   for f in "${original_functions[@]}"; do
     eval "$f"
+  done
+}
+
+__restore_mocked_commands() {
+  for c in "${mocked_commands[@]}"; do
+    unset -f "$c"
   done
 }
 
