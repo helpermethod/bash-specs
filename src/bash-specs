@@ -263,7 +263,8 @@ __mock() {
 }
 
 create_mock() {
-  local function_definition=$(declare -f "$1")
+  local function_definition
+  function_definition=$(declare -f "$1")
   (($? == 0)) && original_functions+=("$function_definition") || mocked_commands+=("$1")
   local mock_definition=$(declare -f __mock)
   eval "${1}()${mock_definition#*\)}"
