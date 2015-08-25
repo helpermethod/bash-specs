@@ -3,14 +3,15 @@
 
 bash-specs is a BDD testing framework for Bash shell scripts. 
 
-    describe 'bash-specs'
+``` bash
+describe 'bash-specs'
     
-    _() {
-      to_start_with 'bash-specs' 'bash'
-    }
-    
-    it 'ends with sh', _
+_() {
+  to_start_with 'bash-specs' 'bash'
+}
 
+it 'ends with sh' _
+```
 ## Features
 
 * test suite isolation 
