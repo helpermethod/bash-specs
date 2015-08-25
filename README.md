@@ -7,7 +7,7 @@ bash-specs is a BDD testing framework for Bash shell scripts.
 describe 'bash-specs'
     
 _() {
-  to_end_with 'bash-specs' 'bash'
+  expect 'bash-specs' to_end_with 'bash'
 }
 
 it 'ends with sh' _
