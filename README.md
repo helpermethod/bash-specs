@@ -7,10 +7,16 @@ bash-specs is a BDD testing framework for Bash shell scripts.
 describe 'bash-specs'
     
 _() {
-  expect 'bash-specs' to_end_with 'bash'
+  expect 'bash-specs' to_start_with 'bash'
 }
 
-it 'ends with sh' _
+it 'starts with bash' _
+
+_() {
+  expect 'bash-specs' to_end_with 'specs'
+}
+
+it 'ends with specs' _
 ```
 ## Features
 
