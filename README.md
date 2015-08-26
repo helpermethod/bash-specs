@@ -17,10 +17,6 @@ _() {
 }
 
 it 'ends with specs' _
-
-_() {
-  expect 'bash-specs' to_contain '-'
-}
 ```
 ## Features
 
