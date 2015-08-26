@@ -32,6 +32,8 @@ _() {
 
 ## Installation
 
+## Usage
+
 ## Contribute
 
 ## Support
