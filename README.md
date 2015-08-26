@@ -3,7 +3,7 @@
 
 bash-specs is a BDD testing framework for Bash shell scripts. 
 
-``` bash
+```bash
 describe 'bash-specs'
     
 _() {
@@ -17,6 +17,10 @@ _() {
 }
 
 it 'ends with specs' _
+
+_() {
+  expect 'bash-specs' to_contain '-'
+}
 ```
 ## Features
 
