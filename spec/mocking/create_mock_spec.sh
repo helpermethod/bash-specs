@@ -20,9 +20,9 @@ _() {
 it 'replaces actual by a mock' _
 
 _() {
-  expect ${t_number_of_calls[f]} to_equal 0
-  expect ${t_queue_size[f]} to_equal 0
-  expect ${t_queue_front[f]} to_equal 0
+  expect ${t_number_of_calls[f]} to_equal 0 || return 
+  expect ${t_queue_size[f]} to_equal 0 || return 
+  expect ${t_queue_front[f]} to_equal 0 || return 
   expect ${t_default_values[f]} to_equal 0
 }
 

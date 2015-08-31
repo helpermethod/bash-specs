@@ -253,7 +253,6 @@ __mock() {
   local number=${number_of_calls[$FUNCNAME]}
 
   for ((i = 1; i <= $#; i++)); do
-    printf "[$FUNCNAME,$number,$((i - 1))]=${!i}"> __mock
     function_calls[$FUNCNAME,$number,$((i - 1))]=${!i}
   done
 
@@ -267,6 +266,7 @@ create_mock() {
   function_definition=$(declare -f "$1")
   (($? == 0)) && original_functions+=("$function_definition") || mocked_commands+=("$1")
   local mock_definition=$(declare -f __mock)
+
   eval "${1}()${mock_definition#*\)}"
 
   number_of_calls[$1]=0
