@@ -327,7 +327,6 @@ __print_summary() {
 main() {
   local directory
   local fail_fast=false
-  local colorize=true
   local pattern
 
   while :; do
@@ -342,10 +341,6 @@ main() {
         ;;
       --fail-fast)
         fail_fast=true
-        shift
-        ;;
-      --no-color)
-        colorize=false
         shift
         ;;
       --pattern)
