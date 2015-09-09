@@ -1,4 +1,6 @@
-cd "${BASH_SOURCE%/*}" && . ../bash-specs
+#cd "${BASH_SOURCE%/*}" && . ../bash-specs
+
+require
 
 describe 'create_mock'
 
@@ -26,4 +28,4 @@ _() {
   expect ${t_default_values[f]} to_equal 0
 }
 
-it 'configured the mock' _
+it 'configures the mock' _
