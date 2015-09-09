@@ -1,6 +1,4 @@
-#cd "${BASH_SOURCE%/*}" && . ../bash-specs
-
-require
+cd "${BASH_SOURCE%/*}" && . ../bash-specs
 
 describe 'create_mock'
 
