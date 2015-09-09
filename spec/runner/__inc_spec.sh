@@ -11,4 +11,4 @@ _() {
   expect "$(< "$inc")" to_equal 1
 }
 
-it "increments the target files's value" _
+it "increments the number in the target file" _
