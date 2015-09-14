@@ -367,7 +367,7 @@ main() {
     esac
   done
 
-  if [[ -t 1 ]] && [[ $colorize == true ]]; then
+  if [[ -t 1 ]]; then
     readonly red=$(tput setaf 1)
     readonly green=$(tput setaf 2)
     readonly cyan=$(tput setaf 6)
