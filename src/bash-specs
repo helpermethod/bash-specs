@@ -32,6 +32,7 @@ readonly number_of_skipped_specs=${tmp_dir}/number_of_skipped_specs
 
 error_message=
 skip_specs=false
+fail_fast=false
 
 original_functions=()
 mocked_commands=()
@@ -326,7 +327,6 @@ __print_summary() {
 
 main() {
   local directory
-  local fail_fast=false
   local pattern
 
   while :; do
