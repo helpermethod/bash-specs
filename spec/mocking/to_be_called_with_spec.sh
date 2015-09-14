@@ -12,7 +12,7 @@ _() {
   expect $? to_equal 0
 }
 
-it 'passes when actual is called with matching parameters' _
+it 'passes when the function is called with matching parameters' _
 
 _() {
   t_number_of_calls[f]=1
@@ -24,7 +24,7 @@ _() {
   expect $? not to_equal 0
 }
 
-it 'fails when actual is called with too few parameters' _
+it 'fails when the function is called with too few parameters' _
 
 _() {
   t_number_of_calls[f]=1
@@ -36,4 +36,4 @@ _() {
   expect $? not to_equal 0
 }
 
-it 'fails when actual is called with too many parameters' _
+it 'fails when the function is called with too many parameters' _
