@@ -61,7 +61,7 @@ run() {
   for spec in ${specs[@]}; do
     (
       require() {
-        cd "${spec%/*}" && . "$1"
+        . "${spec%/*}/$1"
       }
 
       before_each() {
