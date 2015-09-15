@@ -1,4 +1,4 @@
-cd "${BASH_SOURCE%/*}" && . ../bash-specs
+require ../bash-specs
 
 describe 'to_contain'
 
