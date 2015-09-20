@@ -1,4 +1,4 @@
-require ../bash-specs
+. "${current_dir}/../bash-specs"
 
 describe 'to_match'
 

@@ -1,6 +1,6 @@
-require ../bash-specs
+. "${current_dir}/../bash-specs"
 
-describe 'to_end'
+describe 'to_end_with'
 
 _() {
   t_to_end_with 'bash' 'sh'

@@ -60,7 +60,7 @@ run() {
  
   for spec in ${specs[@]}; do
     (
-      current_dir=${spec%/*}
+      readonly current_dir=${spec%/*}
 
       before_each() {
         :

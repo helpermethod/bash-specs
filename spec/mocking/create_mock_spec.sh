@@ -1,4 +1,4 @@
-require ../bash-specs
+. "${current_dir}/../bash-specs"
 
 describe 'create_mock'
 

@@ -1,4 +1,4 @@
-. "$current_dir/../bash-specs"
+. "${current_dir}/../bash-specs"
 
 describe 'to_be_called_with'
 
