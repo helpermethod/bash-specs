@@ -71,7 +71,9 @@ run() {
       }
 
       . "$spec"
-    ) || break 
+    ) 
+
+    (($? > 0)) && [[ $fail_fast == true ]] && break 
   done
 
   __print_summary
