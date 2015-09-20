@@ -60,9 +60,7 @@ run() {
  
   for spec in ${specs[@]}; do
     (
-      require() {
-        cd "${spec%/*}" && . "$1"
-      }
+      current_dir=${spec%/*}
 
       before_each() {
         :
