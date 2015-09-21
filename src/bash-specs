@@ -174,7 +174,7 @@ __print_error_message() {
     ((i < ${#rest} - 1)) && error_message="${error_message},"
   done
 
-  error_message+=('.')
+  error_message="${error_message}."
 
   printf '%s\n' "${error_message//$'\e'/^[}" 1>&2
 }
