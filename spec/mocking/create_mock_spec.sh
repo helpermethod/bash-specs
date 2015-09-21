@@ -16,7 +16,7 @@ _() {
   expect "${#t_original_functions[@]}" to_equal 1
 }
 
-it 'replaces a function with a mock' _
+it 'replaces the function with a mock' _
 
 _() {
   t_create_mock exit
@@ -28,7 +28,7 @@ _() {
   expect "${#t_mocked_commands[@]}" to_equal 1
 }
 
-it 'replaces a command with a mock' _
+it 'replaces the command with a mock' _
 
 _() {
   t_create_mock f
