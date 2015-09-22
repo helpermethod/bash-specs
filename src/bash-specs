@@ -158,25 +158,25 @@ __print_error_message() {
     return
   fi
 
-  local error_message="Expected '$1'"
+  local err_msg="Expected '$1'"
 
   if [[ $2 == not ]]; then
-    error_message="$error_message $2"
+    err_msg="$err_msg $2"
     shift
   fi
 
-  error_message="$error_message ${2//_/ }"
+  err_msg="$err_msg ${2//_/ }"
 
   local rest=(${@:3})
 
   for ((i = 0; i < ${#rest}; i++)); do
-   error_message="$error_message '${rest[i]}'"
-    ((i < ${#rest} - 1)) && error_message="${error_message},"
+   err_msg="$err_msg '${rest[i]}'"
+    ((i < ${#rest} - 1)) && err_msg="${err_msg},"
   done
 
-  error_message="${error_message}."
+  error_message="${err_msg}."
 
-  printf '%s\n' "${error_message//$'\e'/^[}" 1>&2
+  printf '%s\n' "${err_msg//$'\e'/^[}" 1>&2
 }
 
 it() {
