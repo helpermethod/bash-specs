@@ -58,7 +58,7 @@ run() {
     printf 0 > "$f"
   done
  
-  for spec in ${specs[@]}; do
+  for spec in "${specs[@]}"; do
     (
       readonly current_dir=${spec%/*}
 
