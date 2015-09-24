@@ -30,6 +30,14 @@ readonly number_of_specs=${tmp_dir}/number_of_specs
 readonly number_of_failed_specs=${tmp_dir}/number_of_failed_specs
 readonly number_of_skipped_specs=${tmp_dir}/number_of_skipped_specs
 
+if [[ -t 1 ]]; then
+  readonly red=$(tput setaf 1)
+  readonly green=$(tput setaf 2)
+  readonly cyan=$(tput setaf 6)
+  readonly yellow=$(tput setaf 3)
+  readonly reset=$(tput sgr0)
+fi
+
 error_message=
 skip_specs=false
 fail_fast=false
@@ -370,14 +378,6 @@ main() {
         break
     esac
   done
-
-  if [[ -t 1 ]]; then
-    readonly red=$(tput setaf 1)
-    readonly green=$(tput setaf 2)
-    readonly cyan=$(tput setaf 6)
-    readonly yellow=$(tput setaf 3)
-    readonly reset=$(tput sgr0)
-  fi
 
   local specs=($@)
 
