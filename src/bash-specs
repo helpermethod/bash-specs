@@ -149,7 +149,7 @@ to_be_called_with() {
   for ((i = 0; i < ${number_of_calls[$1]}; i++)); do
     for ((j = 2; ; j++)); do
       [[ -z ${function_calls[$1,$i,$((j - 2))]+_} ]] && [[ -z ${!j+_} ]] && break
-      [[ ${function_calls[$1,$i,$((j - 2))]} == ${!j} ]] || continue 2
+      [[ ${function_calls[$1,$i,$((j - 2))]} == "${!j}" ]] || continue 2
     done
 
     return 0
@@ -182,7 +182,7 @@ __print_error_message() {
     ((i < ${#rest} - 1)) && err_msg="${err_msg},"
   done
 
-  error_message="${err_msg}."
+  err_msg="${err_msg}."
 
   printf '%s\n' "${err_msg//$'\e'/^[}" 1>&2
 }
