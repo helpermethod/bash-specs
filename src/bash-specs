@@ -78,6 +78,7 @@ run() {
         :
       }
 
+      # shellcheck source=/dev/null
       . "$spec"
     ) 
 
