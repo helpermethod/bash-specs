@@ -17,7 +17,7 @@
 
 LC_NUMERIC=C
 TIMEFORMAT=%R
-: ${TMPDIR:=/tmp}
+: "${TMPDIR:=/tmp}"
 
 readonly version_number=1.0.0
 
