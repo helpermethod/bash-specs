@@ -230,10 +230,12 @@ __execute_spec() {
 }
 
 __inc() {
+  # shellcheck disable=SC2094
   printf '%d' $(($(< "$1") + 1)) > "$1"
 }
 
 __accumulate_total_elapsed_time() {
+  # shellcheck disable=SC2094
   printf '%d' $(($(< "$total_elapsed_time") + 10#${1/./})) > "$total_elapsed_time"
 }
 
