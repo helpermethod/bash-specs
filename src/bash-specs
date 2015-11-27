@@ -200,6 +200,8 @@ it() {
   __execute_spec "$@"
 
   after_each
+
+  __discard_mocks
 }
 
 __execute_spec() {
@@ -291,6 +293,11 @@ create_mock() {
   default_values[$1]=0
 }
 
+__discard_mocks() {
+  __restore_original_functions
+  __restore_mocked_commands
+}
+
 __restore_original_functions() {
   for f in "${original_functions[@]}"; do
     eval "$f"
@@ -334,10 +341,10 @@ __print_summary() {
   local color
   ((failed == 0)) && color=$green || color=$red
   local total_time=$(< "$total_elapsed_time") 
-  local seconds=$((total_time / 1000))
-  local milli_seconds=$((total_time % 1000))
+  local secs=$((total_time / 1000))
+  local millis=$((total_time % 1000))
 
-  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$total" "$units" "$failed" "$skipped" "$cyan" "$seconds" "$milli_seconds" "$reset"
+  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$total" "$units" "$failed" "$skipped" "$cyan" "$secs" "$millis" "$reset"
 }
 
 main() {
