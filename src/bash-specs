@@ -42,7 +42,7 @@ error_message=
 skip_specs=false
 fail_fast=false
 
-original_functions=()
+mocked_functions=()
 mocked_commands=()
 
 declare -A queue_size
@@ -282,7 +282,7 @@ __mock() {
 create_mock() {
   local function_definition
   function_definition=$(declare -f "$1")
-  (($? == 0)) && original_functions+=("$function_definition") || mocked_commands+=("$1")
+  (($? == 0)) && mocked_functions+=("$function_definition") || mocked_commands+=("$1")
   local mock_definition=$(declare -f __mock)
 
   eval "${1}()${mock_definition#*\)}"
@@ -294,12 +294,12 @@ create_mock() {
 }
 
 __discard_mocks() {
-  __restore_original_functions
+  __restore_mocked_functions
   __restore_mocked_commands
 }
 
-__restore_original_functions() {
-  for f in "${original_functions[@]}"; do
+__restore_mocked_functions() {
+  for f in "${mocked_functions[@]}"; do
     eval "$f"
   done
 }

@@ -13,7 +13,7 @@ _() {
   mock_definition=$(declare -f __t_mock)
 
   expect "${f_definition#*\)}" to_equal "${mock_definition#*\)}" || return
-  expect "${#t_original_functions[@]}" to_equal 1
+  expect "${#t_mocked_functions[@]}" to_equal 1
 }
 
 it 'replaces the function with a mock' _
