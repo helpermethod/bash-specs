@@ -280,17 +280,19 @@ __mock() {
 }
 
 create_mock() {
-  local function_definition
-  function_definition=$(declare -f "$1")
-  (($? == 0)) && mocked_functions+=("$function_definition") || mocked_commands+=("$1")
-  local mock_definition=$(declare -f __mock)
+  for arg; do
+    local function_definition
+    function_definition=$(declare -f "$arg")
+    (($? == 0)) && mocked_functions+=("$function_definition") || mocked_commands+=("$arg")
+    local mock_definition=$(declare -f __mock)
 
-  eval "${1}()${mock_definition#*\)}"
+    eval "${arg}()${mock_definition#*\)}"
 
-  number_of_calls[$1]=0
-  queue_size[$1]=0
-  queue_front[$1]=0
-  default_values[$1]=0
+    number_of_calls[$arg]=0
+    queue_size[$arg]=0
+    queue_front[$arg]=0
+    default_values[$arg]=0
+  done
 }
 
 __discard_mocks() {
