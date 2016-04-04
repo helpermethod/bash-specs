@@ -1,3 +1,4 @@
 sudo: false
 language: bash
+#before_script:
 script: ./run-specs.sh
