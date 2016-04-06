@@ -45,13 +45,15 @@ fail_fast=false
 mocked_functions=()
 mocked_commands=()
 
-declare -A queue_size
-declare -A queue_front
-declare -A value_queue
+if ((BASH_VERSINFO >= 4)); then
+  declare -A queue_size
+  declare -A queue_front
+  declare -A value_queue
 
-declare -A number_of_calls
-declare -A function_calls
-declare -A default_values
+  declare -A number_of_calls
+  declare -A function_calls
+  declare -A default_values
+fi
 
 run() {
   local specs=($@)
