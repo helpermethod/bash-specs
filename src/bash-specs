@@ -30,20 +30,12 @@ readonly number_of_specs=${tmp_dir}/number_of_specs
 readonly number_of_failed_specs=${tmp_dir}/number_of_failed_specs
 readonly number_of_skipped_specs=${tmp_dir}/number_of_skipped_specs
 
-if [[ -t 1 ]]; then
-  readonly red=$(tput setaf 1)
-  readonly green=$(tput setaf 2)
-  readonly cyan=$(tput setaf 6)
-  readonly yellow=$(tput setaf 3)
-  readonly reset=$(tput sgr0)
-fi
-
 error_message=
 skip_specs=false
 fail_fast=false
 
-mocked_functions=()
-mocked_commands=()
+declare -a mocked_functions
+declare -a mocked_commands
 
 if ((BASH_VERSINFO >= 4)); then
   declare -A queue_size
@@ -55,7 +47,7 @@ if ((BASH_VERSINFO >= 4)); then
   declare -A default_values
 fi
 
-run() {
+__run() {
   local specs=($@)
 
   printf 'bash-specs %s\n' "$version_number"
@@ -172,20 +164,20 @@ __print_error_message() {
   local err_msg="Expected '$1'"
 
   if [[ $2 == not ]]; then
-    err_msg="$err_msg $2"
+    err_msg+=" $2"
     shift
   fi
 
-  err_msg="$err_msg ${2//_/ }"
+  err_msg+=" ${2//_/ }"
 
   local rest=(${@:3})
 
   for ((i = 0; i < ${#rest}; i++)); do
-   err_msg="$err_msg '${rest[i]}'"
-    ((i < ${#rest} - 1)) && err_msg="${err_msg},"
+   err_msg+=" '${rest[i]}'"
+    ((i < ${#rest} - 1)) && err_msg+=,
   done
 
-  err_msg="${err_msg}."
+  err_msg+=.
 
   printf '%s\n' "${err_msg//$'\e'/^[}" 1>&2
 }
@@ -217,14 +209,14 @@ __execute_spec() {
   __accumulate_total_elapsed_time "$elapsed"
 
   if ((result == 0)); then
-    __print_spec_result "$green" "$1" "$elapsed"
+    __print_spec_result "$pass" "$1" "$elapsed"
 
     return
   fi
 
   __inc "$number_of_failed_specs"
 
-  __print_spec_result "$red" "$1" "$elapsed"
+  __print_spec_result "$fail" "$1" "$elapsed"
 
   if [[ -s "$stderr" ]]; then
     printf '    %s\n' "$(< "$stderr")"
@@ -244,14 +236,14 @@ __accumulate_total_elapsed_time() {
 }
 
 __print_spec_result() {
-  printf '%s  %s%s (%.3f s)%s\n' "$1" "$2" "$cyan" "$3" "$reset"
+  printf '  %s%s%s (%.3f s)%s\n' "$1" "$2" "$highlight" "$3" "$reset"
 }
 
 xit() {
   __inc "$number_of_specs"
   __inc "$number_of_skipped_specs"
 
-  __print_spec_result "$yellow" "$1" 0
+  __print_spec_result "$skip" "$1" 0
 }
 
 xdescribe() {
@@ -342,18 +334,19 @@ __print_summary() {
   local skipped=$(< "$number_of_skipped_specs")
   local units
   ((total == 1)) && units=spec || units=specs
-  local color
-  ((failed == 0)) && color=$green || color=$red
+  local status
+  ((failed == 0)) && status=$pass || status=$fail
   local total_time=$(< "$total_elapsed_time") 
   local secs=$((total_time / 1000))
   local millis=$((total_time % 1000))
 
-  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$color" "$total" "$units" "$failed" "$skipped" "$cyan" "$secs" "$millis" "$reset"
+  printf '\n%s%s %s, %s failed, %s skipped%s (%d.%03d s)%s\n' "$status" "$total" "$units" "$failed" "$skipped" "$highlight" "$secs" "$millis" "$reset"
 }
 
 main() {
   local directory
   local pattern
+  local color=true
 
   while :; do
     case "$1" in
@@ -377,6 +370,10 @@ main() {
         pattern=${1#*=}
         shift
         ;;
+      --no-color)
+        color=false
+        shift
+        ;;
       --help)
         ;;
       --version)
@@ -393,6 +390,18 @@ main() {
     esac
   done
 
+  if [[ $color == true ]] && [[ -t 1 ]] && (($(tput colors) >= 8)); then
+    readonly fail=$(tput setaf 1)
+    readonly pass=$(tput setaf 2)
+    readonly highlight=$(tput setaf 6)
+    readonly skip=$(tput setaf 3)
+    readonly reset=$(tput sgr0)
+  else
+    readonly fail='FAIL '
+    readonly pass='PASS '
+    readonly skip='SKIP '
+  fi
+
   local specs=($@)
 
   if ((${#specs[@]} == 0)); then
@@ -401,7 +410,7 @@ main() {
     done < <(find "${directory:-spec}" -name "${pattern:-*_spec.sh}" -print0)
   fi
 
-  run "${specs[@]}"
+  __run "${specs[@]}"
 }
 
 [[ $0 == "$BASH_SOURCE" ]] && main "$@"
