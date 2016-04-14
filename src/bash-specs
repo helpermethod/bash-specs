@@ -34,10 +34,10 @@ error_message=
 skip_specs=false
 fail_fast=false
 
-declare -a mocked_functions
-declare -a mocked_commands
-
 if ((BASH_VERSINFO >= 4)); then
+  declare -a mocked_functions
+  declare -a mocked_commands
+
   declare -A queue_size
   declare -A queue_front
   declare -A value_queue
@@ -52,6 +52,7 @@ __run() {
 
   printf 'bash-specs %s\n' "$version_number"
 
+  # TODO register traps before creating the directory
   mkdir -m 700 "$tmp_dir"
   trap __cleanup TERM EXIT
   trap __cleanup_int INT
@@ -278,6 +279,7 @@ create_mock() {
     local function_definition
     function_definition=$(declare -f "$target")
     (($? == 0)) && mocked_functions+=("$function_definition") || mocked_commands+=("$target")
+    # TODO determine mock definition once
     local mock_definition=$(declare -f __mock)
 
     eval "${target}()${mock_definition#*\)}"
@@ -400,6 +402,11 @@ main() {
     readonly fail='FAIL '
     readonly pass='PASS '
     readonly skip='SKIP '
+  fi
+
+  if command -v entr > /dev/null 2>&1; then 
+    # TODO run specs continously 
+    :
   fi
 
   local specs=($@)
