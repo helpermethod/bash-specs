@@ -1,4 +1,4 @@
 sudo: false
-language: bash
-#before_script:
-script: ./run-specs.sh
+language: ruby
+install: gem install bashcov
+script: bashcov ./run-specs.sh

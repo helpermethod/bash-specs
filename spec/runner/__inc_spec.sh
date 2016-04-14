@@ -8,7 +8,7 @@ _() {
   printf 0 > "$inc" 
   __t_inc "$inc"
 
-  expect "$(< "$inc")" to_equal 1
+  expect "$(< "$inc")" to_equal 2
 }
 
 it 'increments the number in the target file' _
