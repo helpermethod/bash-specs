@@ -4,6 +4,3 @@ rvm:
   2.2
 install: gem install bashcov
 script: bashcov ./run-specs.sh
-addons:
-  code_climate:
-    repo_token: 4f1b3808e4996a68d85b50347ad9263e8660dda73bdb6501b99f9e218d7cd6ae

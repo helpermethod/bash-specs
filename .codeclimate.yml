@@ -1,8 +1,9 @@
 engines:
  shellcheck:
-    enabled: true    
+    enabled: true
 ratings:
-  paths: []
+  paths: 
+    - src/bash-specs
 exclude_paths:
 - run-specs.sh
 - spec/
