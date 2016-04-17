@@ -2,5 +2,5 @@ sudo: false
 language: ruby
 rvm:
   2.2
-install: gem install bashcov
+install: gem install bashcov codeclimate-test-reporter 
 script: bashcov ./run-specs.sh

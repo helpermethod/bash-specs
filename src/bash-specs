@@ -392,7 +392,7 @@ main() {
     esac
   done
 
-  if [[ $color == true ]] && [[ -t 1 ]] && (($(tput colors) >= 8)); then
+  if [[ $color == true ]] && [[ -t 1 ]] && command -v tput > /dev/null 2>&1 && (($(tput colors) >= 8)); then
     readonly fail=$(tput setaf 1)
     readonly pass=$(tput setaf 2)
     readonly highlight=$(tput setaf 6)
