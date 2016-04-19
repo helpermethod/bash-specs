@@ -1,18 +1,18 @@
-. "${current_dir}/../bash-specs"
+. src/bash-specs
 
-describe 'xdescribe'
-
-_() {
- expect "$(t_xdescribe 'bash')" to_equal $'\nbash'
-}
-
-it 'prints the name of the spec suite' _
+t_describe 'xdescribe'
 
 _() {
-  t_skip_specs=false
-  t_xdescribe 'bash'
-
-  expect "$t_skip_specs" to_equal true
+ t_expect "$(xdescribe 'bash')" t_to_equal $'\nbash'
 }
 
-it 'sets the skip_specs flag to true' _
+t_it 'prints the name of the spec suite' _
+
+_() {
+  skip_specs=false
+  xdescribe 'bash'
+
+  t_expect "$skip_specs" t_to_equal true
+}
+
+t_it 'sets the skip_specs flag to true' _

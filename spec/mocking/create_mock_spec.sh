@@ -1,42 +1,42 @@
-. "${current_dir}/../bash-specs"
+. src/bash-specs
 
-describe 'create_mock'
+t_describe 'create_mock'
 
 f() {
   :
 }  
 
 _() {
-  t_create_mock f
+  create_mock f
 
-  f_definition=$(declare -f f)
-  mock_definition=$(declare -f __t_mock)
+  local f_definition=$(declare -f f)
+  local mock_definition=$(declare -f __mock)
 
-  expect "${f_definition#*\)}" to_equal "${mock_definition#*\)}" || return
-  expect "${#t_mocked_functions[@]}" to_equal 1
+  t_expect "${f_definition#*\)}" t_to_equal "${mock_definition#*\)}" || return
+  t_expect "${#mocked_functions[@]}" to_equal 1
 }
 
-it 'replaces the function with a mock' _
+t_it 'replaces the function with a mock' _
 
 _() {
-  t_create_mock exit
+  create_mock exit
 
-  f_definition=$(declare -f f)
-  mock_definition=$(declare -f __t_mock)
+  local f_definition=$(declare -f f)
+  local mock_definition=$(declare -f __mock)
 
-  expect "${f_definition#*\)}" to_equal "${mock_definition#*\)}" || return
-  expect "${#t_mocked_commands[@]}" to_equal 1
+  t_expect "${f_definition#*\)}" t_to_equal "${mock_definition#*\)}" || return
+  t_expect "${#mocked_commands[@]}" to_equal 1
 }
 
-it 'replaces the command with a mock' _
+t_it 'replaces the command with a mock' _
 
 _() {
-  t_create_mock f
+  create_mock f
 
-  expect ${t_number_of_calls[f]} to_equal 0 || return 
-  expect ${t_queue_size[f]} to_equal 0 || return 
-  expect ${t_queue_front[f]} to_equal 0 || return 
-  expect ${t_default_values[f]} to_equal 0
+  t_expect ${number_of_calls[f]} t_to_equal 0 || return 
+  t_expect ${queue_size[f]} t_to_equal 0 || return 
+  t_expect ${queue_front[f]} t_to_equal 0 || return 
+  t_expect ${default_values[f]} t_to_equal 0
 }
 
-it 'configures the mock' _
+t_it 'configures the mock' _

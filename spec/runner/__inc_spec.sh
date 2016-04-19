@@ -1,14 +1,14 @@
-. "${current_dir}/../bash-specs"
+. src/bash-specs
 
-describe '__inc'
+t_describe '__inc'
 
 _() {
-  local inc="$tmp_dir/inc"
+  local inc="$t_tmp_dir/inc"
 
   printf 0 > "$inc" 
-  __t_inc "$inc"
+  __inc "$inc"
 
-  expect "$(< "$inc")" to_equal 1
+  t_expect "$(< "$inc")" t_to_equal 1
 }
 
-it 'increments the number in the target file' _
+t_it 'increments the number in the target file' _

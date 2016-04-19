@@ -1,5 +1,5 @@
 main() {
-  rm -rf spec/bash-specs
+#  trap 'rm -rf spec/bash-specs' EXIT
 
   cp {src,spec}/bash-specs
 
@@ -11,7 +11,7 @@ main() {
   (IFS='|'; sed -i -r -e "s/\b(${globals[*]})\b/t_\1/g" \
     -e "s/(__)(${globals[*]})\b/\1t_\2/" spec/bash-specs)
 
-  src/bash-specs "$@"
+  spec/bash-specs "$@"
 }
 
 main "$@"
