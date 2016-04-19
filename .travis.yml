@@ -3,4 +3,4 @@ language: ruby
 rvm:
   2.2
 install: gem install bashcov codeclimate-test-reporter 
-script: bashcov ./run-specs.sh
+script: bashcov run-specs.sh
