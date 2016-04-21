@@ -52,10 +52,10 @@ __run() {
 
   printf 'bash-specs %s\n' "$version_number"
 
-  # TODO register traps before creating the directory
-  mkdir -m 700 "$tmp_dir"
   trap __cleanup TERM EXIT
   trap __cleanup_int INT
+
+  mkdir -m 700 "$tmp_dir"
 
   for f in "$number_of_specs" "$number_of_failed_specs" "$number_of_skipped_specs" "$total_elapsed_time"; do
     printf 0 > "$f"
