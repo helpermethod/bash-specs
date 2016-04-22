@@ -169,7 +169,8 @@ __print_error_message() {
     shift
   fi
 
-  err_msg+=" ${2//_/ }"
+  local matcher=${2#t_}
+  err_msg+=" ${matcher//_/ }"
 
   local rest=(${@:3})
 
@@ -405,7 +406,7 @@ main() {
   fi
 
   if command -v entr > /dev/null 2>&1; then 
-    # TODO run specs continously 
+    # TODO run specs continuously 
     :
   fi
 
