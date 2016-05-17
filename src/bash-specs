@@ -30,6 +30,7 @@ readonly number_of_specs=${tmp_dir}/number_of_specs
 readonly number_of_failed_specs=${tmp_dir}/number_of_failed_specs
 readonly number_of_skipped_specs=${tmp_dir}/number_of_skipped_specs
 
+total_elapsed=
 error_message=
 skip_specs=false
 fail_fast=false
@@ -60,7 +61,8 @@ __run() {
   for f in "$number_of_specs" "$number_of_failed_specs" "$number_of_skipped_specs" "$total_elapsed_time"; do
     printf 0 > "$f"
   done
- 
+
+   
   for spec in "${specs[@]}"; do
     (
       readonly current_dir=${spec%/*}
@@ -191,40 +193,51 @@ it() {
     return
   fi
 
-  before_each
+  total_elapsed=0
 
-  __execute_spec "$@"
-
-  after_each
+  __exec before_each && 
+  __exec "$2"
+  local status=$?
+  __exec after_each
+  status=$(($? || status))
 
   __discard_mocks
-}
-
-__execute_spec() {
-  { time "$2" > /dev/null 2> "$stderr"; } 2> "$elapsed_time"
-  local result=$?
-
   __inc "$number_of_specs"
+  __accumulate_total_elapsed_time "$total_elapsed"
 
-  local elapsed=$(< "$elapsed_time")
+  __discard_mocks
 
-  __accumulate_total_elapsed_time "$elapsed"
-
-  if ((result == 0)); then
-    __print_spec_result "$pass" "$1" "$elapsed"
+  if ((status == 0)); then
+    __print_spec_result "$pass" "$1" "$total_elapsed"
 
     return
   fi
 
   __inc "$number_of_failed_specs"
 
-  __print_spec_result "$fail" "$1" "$elapsed"
+  __print_spec_result "$fail" "$1" "$total_elapsed"
 
   if [[ -s "$stderr" ]]; then
     printf '    %s\n' "$(< "$stderr")"
   fi
 
   [[ $fail_fast == true ]] && exit 1
+}
+
+__exec() {
+  set -e
+  { time "$1" > /dev/null 2> "$stderr"; } 2> "$elapsed_time"
+  set +e
+  local result=$?
+
+  if ((result > 0)); then
+    printf "%s:%s" "$1" "$(< "$stderr")"
+  fi
+  
+  local elapsed=$(< "$elapsed_time")
+  ((total_elapsed += 10#${elapsed/./}))
+
+  return "$result"
 }
 
 __inc() {
@@ -238,7 +251,7 @@ __accumulate_total_elapsed_time() {
 }
 
 __print_spec_result() {
-  printf '  %s%s%s (%.3f s)%s\n' "$1" "$2" "$highlight" "$3" "$reset"
+  printf '  %s%s%s (%d.%03d s)%s\n' "$1" "$2" "$highlight" "$(($3 / 1000))" "$(($3 % 1000))" "$reset"
 }
 
 xit() {
@@ -329,6 +342,18 @@ __cleanup_int() {
 
 __cleanup() {
   rm -rf "$tmp_dir"
+}
+
+__trace() {
+  while caller $frame; do
+    ((frame++))
+  done
+
+  printf '%s\n' "$*"
+
+#  for ((i = ${#FUNCNAME}; i >= 0; i--)); do
+#    printf '%s %s\n' "${BASH_SOURCE[i]}" "${FUNCNAME[i]}"
+#  done
 }
  
 __print_summary() {

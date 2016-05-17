@@ -1,5 +1,5 @@
 main() {
-  trap 'rm -rf spec/bash-specs' EXIT
+#  trap 'rm -rf spec/bash-specs' EXIT
 
   cp {src,spec}/bash-specs
 
