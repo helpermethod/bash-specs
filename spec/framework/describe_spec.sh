@@ -3,6 +3,7 @@
 describe 'describe'
 
 _() {
+  false
   t_expect "$(describe 'bash')" t_to_equal $'\nbash'
 }
 

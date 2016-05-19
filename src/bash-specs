@@ -61,7 +61,6 @@ __run() {
   for f in "$number_of_specs" "$number_of_failed_specs" "$number_of_skipped_specs" "$total_elapsed_time"; do
     printf 0 > "$f"
   done
-
    
   for spec in "${specs[@]}"; do
     (
@@ -194,6 +193,7 @@ it() {
   fi
 
   total_elapsed=0
+  > "$stderr"
 
   __exec before_each && 
   __exec "$2"
@@ -225,15 +225,11 @@ it() {
 }
 
 __exec() {
-  set -e
-  { time "$1" > /dev/null 2> "$stderr"; } 2> "$elapsed_time"
-  set +e
+#  trap "__trace $1" ERR
+  { time "$1" > /dev/null 2>> "$stderr"; } 2> "$elapsed_time"
   local result=$?
+#  trap - ERR
 
-  if ((result > 0)); then
-    printf "%s:%s" "$1" "$(< "$stderr")"
-  fi
-  
   local elapsed=$(< "$elapsed_time")
   ((total_elapsed += 10#${elapsed/./}))
 
@@ -342,18 +338,6 @@ __cleanup_int() {
 
 __cleanup() {
   rm -rf "$tmp_dir"
-}
-
-__trace() {
-  while caller $frame; do
-    ((frame++))
-  done
-
-  printf '%s\n' "$*"
-
-#  for ((i = ${#FUNCNAME}; i >= 0; i--)); do
-#    printf '%s %s\n' "${BASH_SOURCE[i]}" "${FUNCNAME[i]}"
-#  done
 }
  
 __print_summary() {
