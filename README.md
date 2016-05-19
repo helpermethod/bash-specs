@@ -5,7 +5,6 @@ A modern BDD testing framework for Bash
 [![Build Status](https://travis-ci.org/helpermethod/bash-specs.svg?branch=master)](https://travis-ci.org/helpermethod/bash-specs)
 [![Test Coverage](https://codeclimate.com/github/helpermethod/bash-specs/badges/coverage.svg)](https://codeclimate.com/github/helpermethod/bash-specs/coverage)
 [![Code Climate](https://codeclimate.com/github/helpermethod/bash-specs/badges/gpa.svg)](https://codeclimate.com/github/helpermethod/bash-specs)
-[![Issue Count](https://codeclimate.com/github/helpermethod/bash-specs/badges/issue_count.svg)](https://codeclimate.com/github/helpermethod/bash-specs)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://github.com/helpermethod/bash-specs/blob/master/COPYING)
 
 ```bash
