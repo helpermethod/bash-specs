@@ -9,7 +9,7 @@ t_before_each() {
 _() {
   xit 'skip'
 
-  t_expect __inc t_to_be_called_with "a"# || return
+  t_expect __inc t_to_be_called_with "$number_of_specs" || return
   t_expect __inc t_to_be_called_with "$number_of_skipped_specs"
 }
 
