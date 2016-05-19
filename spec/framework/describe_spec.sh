@@ -1,6 +1,6 @@
 . src/bash-specs
 
-describe 'describe'
+t_describe 'describe'
 
 _() {
   false
