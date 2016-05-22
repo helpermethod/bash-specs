@@ -2,8 +2,11 @@
 
 t_describe 'describe'
 
+t_before_each() {
+  ls xxx
+}
+
 _() {
-  false
   t_expect "$(describe 'bash')" t_to_equal $'\nbash'
 }
 
