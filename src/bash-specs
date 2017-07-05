@@ -25,7 +25,6 @@ readonly tmp_dir=${TMPDIR}/${RANDOM}.${RANDOM}.$$
 readonly elapsed_time=${tmp_dir}/elapsed_time
 readonly total_elapsed_time=${tmp_dir}/total_elapsed_time
 readonly stderr=${tmp_dir}/stderr
-readonly errors=${tmp_dir}/errors
 
 readonly number_of_specs=${tmp_dir}/number_of_specs
 readonly number_of_failed_specs=${tmp_dir}/number_of_failed_specs
@@ -194,7 +193,7 @@ it() {
   fi
 
   total_elapsed=0
-  > "$errors"
+  > "$stderr"
 
   __exec before_each && 
   __exec "$2"
@@ -218,26 +217,18 @@ it() {
 
   __print_spec_result "$fail" "$1" "$total_elapsed"
 
-  if [[ -s "$errors" ]]; then
-    printf '    %s:\n' "${BASH_SOURCE[1]}"
-    printf '%s\n' "$(< "$errors")"
+  if [[ -s "$stderr" ]]; then
+    printf '    %s\n' "$(< "$stderr")"
   fi
 
   [[ $fail_fast == true ]] && exit 1
 }
 
 __exec() {
-  set -e
-  { time "$1" > /dev/null 2> "$stderr"; } 2> "$elapsed_time"
+#  trap "__trace $1" ERR
+  { time "$1" > /dev/null 2>> "$stderr"; } 2> "$elapsed_time"
   local result=$?
-  set +e
-
-  if ((result > 0)); then
-    local err="$(< "$stderr")"
-    [[ -z "$err" ]] && err='The function exited with a non-zero status'
-    printf '      %s:\n' "$1" >> "$errors"
-    printf '        %s\n' "$err" >> "$errors" 
-  fi
+#  trap - ERR
 
   local elapsed=$(< "$elapsed_time")
   ((total_elapsed += 10#${elapsed/./}))
